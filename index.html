@@ -5821,6 +5821,18 @@ function _tocarSomGeral(procs) {
 }
 
 
+// ─── HELPER WHATSAPP: copia texto e abre app ───
+async function _abrirWhatsApp(texto) {
+    try {
+        await navigator.clipboard.writeText(texto);
+        window.showSyncToast && window.showSyncToast('✅ Copiado! Cole no WhatsApp (Ctrl+V)');
+    } catch(e) {
+        window.showSyncToast && window.showSyncToast('⚠️ Não foi possível copiar automaticamente');
+    }
+    const isMobile = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+    window.open(isMobile ? 'https://wa.me/' : 'https://web.whatsapp.com', '_blank');
+}
+
 // ─── EXPORTAR WHATSAPP — cirurgias realizadas ───
 async function exportarWhatsApp() {
     await verificarPromocaoRetirada();
@@ -5957,7 +5969,7 @@ async function exportarWhatsApp() {
     linhas.push('━━━━━━━━━━━━━━━━━━━━━━');
     linhas.push('Total: *' + (cirurgias.length + coletas.length + agendados.length) + ' item(ns)*');
 
-    window.open('https://wa.me/?text=' + encodeURIComponent(linhas.join('\n')), '_blank');
+    _abrirWhatsApp(linhas.join('\n'));
 }
 
 
@@ -8633,7 +8645,7 @@ function cobrarVolumesWhatsApp() {
     linhas.push('━━━━━━━━━━━━━━━━━━━━━━');
     linhas.push('Total: *' + coletas.length + ' volume(s) urgente(s)*');
 
-    window.open('https://wa.me/?text=' + encodeURIComponent(linhas.join('\n')), '_blank');
+    _abrirWhatsApp(linhas.join('\n'));
 }
 function cobrarAgendadosWhatsApp() {
     const hoje = todayStr();
@@ -8691,7 +8703,7 @@ function cobrarAgendadosWhatsApp() {
     linhas.push('━━━━━━━━━━━━━━━━━━━━━━');
     linhas.push(`Total: *${lista.length} cirurgia(s) agendada(s)*`);
 
-    window.open('https://wa.me/?text=' + encodeURIComponent(linhas.join('\n')), '_blank');
+    _abrirWhatsApp(linhas.join('\n'));
 }
 
 
@@ -9036,7 +9048,7 @@ function compartilharWhatsApp(docId) {
             proc.obs?`📝 Obs: ${proc.obs}`:'',
         ];
     }
-    window.open('https://wa.me/?text='+encodeURIComponent(linhas.filter(Boolean).join('\n')),'_blank');
+    _abrirWhatsApp(linhas.filter(Boolean).join('\n'));
 }
 
 // ════════════════════════════════════════════
@@ -12724,7 +12736,7 @@ window.fecharChecklist = fecharChecklist;
       `Vendedor: ${p.vendedor || '—'}`,
       prazo ? `SLA: ${prazo.label} · ${prazo.text}` : ''
     ].filter(Boolean);
-    window.open('https://wa.me/?text=' + encodeURIComponent(linhas.join('\n')), '_blank');
+    _abrirWhatsApp(linhas.join('\n'));
   };
 
   window.renderTable = function(){
@@ -14789,8 +14801,7 @@ window.exportarWhatsAppColeta = function() {
         linhas.push('');
     });
     linhas.push('_Enviado pelo Monitor Cirúrgico GF Medical_');
-    window.open('https://wa.me/?text=' + encodeURIComponent(linhas.join('
-')), '_blank');
+    _abrirWhatsApp(linhas.join('\n'));
 };
 
 // ════════════════════════════════════════════
