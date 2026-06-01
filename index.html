@@ -166,6 +166,16 @@
 
               const paraPromover = [];
               dados.forEach(p => {
+                // Agendado + véspera (D+1) → Em Separação (silencioso)
+                if (p.status === 'agendado' && p.data && p.data === amanha) {
+                  p.status = 'preparacao';
+                  p.autoTransicaoEm = new Date().toISOString();
+                  try { notificarMudancaStatus(p, 'agendado'); } catch(e3) {}
+                  try {
+                    const { setDoc: sd, doc: docFn } = window._fbModules;
+                    if (p._docId) sd(docFn(db, COLL, p._docId), { ...p });
+                  } catch(e2) { console.warn('Auto-status:', e2); }
+                }
                 // Em Trânsito + dia da cirurgia → Em Procedimento (silencioso)
                 if (p.status === 'em_transito' && p.data && p.data === hoje) {
                   p.status = 'andamento';
@@ -619,6 +629,29 @@
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 8px 28px rgba(75,180,210,0.5);
         }
+
+        .fab-nova-cirurgia {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            right: 20px;
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            font-size: 2rem;
+            font-weight: 300;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+            z-index: 990;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .fab-nova-cirurgia:active { transform: scale(0.92); }
+        @media (max-width: 960px) { .fab-nova-cirurgia { display: flex; } }
 
         /* ─── TIMELINE VIEW ─── */
         .view-tabs {
@@ -7835,8 +7868,8 @@ async function saveProcedure(e) {
         proc._docId = existingProc._docId;
     }
 
-    // Auto: Agendado + NF inserida → Em Trânsito
-    if (proc.status === 'agendado' && proc.nf && proc.nf.trim()) {
+    // Auto: Em Separação + NF inserida → Em Trânsito
+    if (proc.status === 'preparacao' && proc.nf && proc.nf.trim()) {
         proc.status = 'em_transito';
     }
 
@@ -19424,5 +19457,6 @@ else init();
 
 })();
 </script>
+<button class="fab-nova-cirurgia" onclick="openModal()" aria-label="Nova cirurgia">+</button>
 </body>
 </html>
