@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v4';
+const CACHE = 'monitor-cba-v5';
 const LOCAL_ASSETS = [
   '/gfcuiaba/',
   '/gfcuiaba/index.html',
