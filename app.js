@@ -2831,7 +2831,7 @@ function renderTable() {
             +(proc.retirada ? '<div style="font-size:0.65rem;font-weight:700;color:#f97316;margin-top:1px;">📦 '+new Date(proc.retirada+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+'</div>' : '')
             +'</td>';
         row += '<td style="padding:9px 12px;">'+statusPill+'</td>';
-        row += '<td style="font-family:\\'Space Grotesk\\',sans-serif;font-weight:600;font-size:0.83rem;padding:9px 12px;max-width:210px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="'+(proc.paciente||'')+'">'+(proc.paciente||'—')+'</td>';
+        row += '<td style="font-family:\'Space Grotesk\',sans-serif;font-weight:600;font-size:0.83rem;padding:9px 12px;max-width:210px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="'+(proc.paciente||'')+'">'+(proc.paciente||'—')+'</td>';
         var nfDataFmt = proc.nfData ? new Date(proc.nfData+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '—';
         row += '<td style="font-family:var(--mono);font-size:0.77rem;font-weight:600;padding:9px 12px;min-width:80px;text-align:center;">'+(proc.nf||'—')+'</td>';
         row += '<td style="font-family:var(--mono);font-size:0.77rem;font-weight:600;padding:9px 12px;min-width:90px;text-align:center;'+(proc.nfData?'color:#2a7a6a;':'color:var(--text-dim);')+'">'+nfDataFmt+'</td>';
