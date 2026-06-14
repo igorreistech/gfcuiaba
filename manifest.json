@@ -1,11 +1,10 @@
 {
-  "id": "/gfcuiaba/",
   "lang": "pt-BR",
   "name": "Monitor Cirúrgico · Cuiabá",
   "short_name": "Monitor CBA",
   "description": "Acompanhamento cirúrgico em tempo real · Cuiabá, MT",
-  "start_url": "/gfcuiaba/",
-  "scope": "/gfcuiaba/",
+  "start_url": ".",
+  "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#0d1f0e",
@@ -21,7 +20,7 @@
       "name": "Nova Cirurgia",
       "short_name": "Nova",
       "description": "Cadastrar novo procedimento cirúrgico",
-      "url": "/gfcuiaba/",
+      "url": ".",
       "icons": [{ "src": "icon.svg", "sizes": "any" }]
     }
   ]

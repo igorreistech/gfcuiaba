@@ -1,11 +1,12 @@
-const CACHE = 'monitor-cba-v7';
+const CACHE = 'monitor-cba-v8';
+const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
-  '/gfcuiaba/',
-  '/gfcuiaba/index.html',
-  '/gfcuiaba/styles.css',
-  '/gfcuiaba/app.js',
-  '/gfcuiaba/manifest.json',
-  '/gfcuiaba/icon.svg',
+  BASE,
+  BASE + 'index.html',
+  BASE + 'styles.css',
+  BASE + 'app.js',
+  BASE + 'manifest.json',
+  BASE + 'icon.svg',
 ];
 
 self.addEventListener('install', e => {
@@ -26,32 +27,27 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Requisições de navegação: tenta rede, fallback para cache
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match('/gfcuiaba/'))
+      fetch(e.request).catch(() => caches.match(BASE))
     );
     return;
   }
 
-  // Assets locais: cache-first
-  if (LOCAL_ASSETS.some(a => url.pathname === a || url.pathname.startsWith('/gfcuiaba/'))) {
-    const isLocal = !url.hostname.includes('googleapis') &&
-                    !url.hostname.includes('gstatic') &&
-                    !url.hostname.includes('firebaseapp') &&
-                    !url.hostname.includes('cdnjs');
-    if (isLocal) {
-      e.respondWith(
-        caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-          return res;
-        }))
-      );
-      return;
-    }
+  const isLocal = !url.hostname.includes('googleapis') &&
+                  !url.hostname.includes('gstatic') &&
+                  !url.hostname.includes('firebaseapp') &&
+                  !url.hostname.includes('cdnjs');
+  if (isLocal && url.pathname.startsWith(BASE)) {
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }))
+    );
+    return;
   }
 
-  // Demais requisições: network-first
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
