@@ -1045,7 +1045,6 @@ function statusLabel(s) {
 
 function renderCards() {
     try { updateStats(); updatePeriodResult(); atualizarFiltroVendedor(); } catch(e) { console.warn(e); }
-    document.dispatchEvent(new CustomEvent('opme:refresh'));
     if (currentView === 'timeline') { try { renderTimeline(); } catch(e){} return; }
     if (currentView === 'table')    { try { renderTable(); }    catch(e){} return; }
     if (currentView === 'abc')      { try { renderABC(); }      catch(e){} return; }
@@ -1633,10 +1632,6 @@ async function conclude(docId) {
     }
     await fbSaveProc(proc);
 
-    // ── Abrir Ficha OPME pré-montada após conclusão ──
-    if (proc.status === 'concluido') {
-        setTimeout(() => abrirOpmePosConclusao(proc), 400);
-    }
 }
 
 function promptConcluir(proc) {
