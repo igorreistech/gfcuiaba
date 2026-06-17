@@ -1,30 +1,31 @@
-# Monitor Cirúrgico · GF Medical — Cuiabá, MT
+# Portfólio de Desenvolvimento
 
-Monitor em tempo real de procedimentos cirúrgicos da unidade de Cuiabá, conectado ao Firebase (`gfcuiaba-53b8d`).
+Site estático para apresentar serviços, stack e cases de desenvolvimento de software de forma genérica.
+
+O projeto deixou de ser uma vitrine exclusiva do Monitor Cirúrgico. Esse sistema agora aparece apenas como
+um case de solução operacional em tempo real, ao lado de outras possibilidades como dashboards, portais
+internos, automações e landing pages.
 
 ## Estrutura
 
 | Arquivo | Descrição |
 |---|---|
-| `index.html` | Estrutura HTML e Firebase module script |
-| `styles.css` | Estilos principais da aplicação |
-| `app.js` | Lógica principal (renderização, filtros, modais, export) |
-| `sw.js` | Service Worker — cache offline |
-| `manifest.json` | Configuração PWA |
-| `icon.svg` | Ícone da aplicação |
+| `index.html` | Conteúdo principal do portfólio |
+| `styles.css` | Identidade visual, layout responsivo e animações |
+| `app.js` | Menu mobile, navegação ativa, reveal on scroll e cópia de e-mail |
+| `sw.js` | Service Worker para cache offline básico |
+| `manifest.json` | Configuração PWA do portfólio |
+| `icon.svg` | Ícone vetorial da aplicação |
 
-## Funcionalidades
+## Personalização rápida
 
-- Autenticação via e-mail/senha (Firebase Auth)
-- CRUD de procedimentos em tempo real (Firestore)
-- Notificações push de mudança de status
-- Visualização em cards, tabela e timeline
-- Exportação para Excel (XLSX)
-- Curva ABC por vendedor e hospital
-- Modo offline via Service Worker
-- Upload de anexos (Firebase Storage)
+1. Troque `contato@exemplo.com` no `index.html` pelo e-mail definitivo.
+2. Ajuste os textos de serviços e projetos para refletir os cases reais.
+3. Adicione links de demonstração, GitHub ou WhatsApp nos cards de projeto, se necessário.
+4. Atualize nome, marca e cores em `styles.css` caso exista uma identidade visual própria.
 
-## Firebase
+## Publicação
 
-- **Projeto:** `gfcuiaba-53b8d`
-- **Coleção:** `procedimentos_cba`
+O Firebase Hosting continua configurado para publicar a raiz do repositório. Para outros provedores,
+basta hospedar os arquivos estáticos principais (`index.html`, `styles.css`, `app.js`, `manifest.json`,
+`sw.js` e `icon.svg`).

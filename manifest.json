@@ -1,26 +1,24 @@
 {
   "lang": "pt-BR",
-  "name": "Monitor Cirúrgico · Cuiabá",
-  "short_name": "Monitor CBA",
-  "description": "Acompanhamento cirúrgico em tempo real · Cuiabá, MT",
+  "name": "Portfólio de Desenvolvimento",
+  "short_name": "Dev Portfolio",
+  "description": "Portfólio de desenvolvimento de software, automações, dashboards e aplicações web.",
   "start_url": ".",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "theme_color": "#0d1f0e",
-  "background_color": "#0d1f0e",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
   "prefer_related_applications": false,
   "icons": [
-    { "src": "logo.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any" },
-    { "src": "logo.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "maskable" },
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ],
   "shortcuts": [
     {
-      "name": "Nova Cirurgia",
-      "short_name": "Nova",
-      "description": "Cadastrar novo procedimento cirúrgico",
-      "url": ".",
+      "name": "Projetos",
+      "short_name": "Projetos",
+      "description": "Ver projetos e cases de desenvolvimento",
+      "url": "./#projetos",
       "icons": [{ "src": "icon.svg", "sizes": "any" }]
     }
   ]

@@ -1,10 +1,11 @@
-const CACHE = 'monitor-cba-v10';
+const CACHE = 'dev-portfolio-v1';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
   BASE + 'index.html',
   BASE + 'styles.css',
   BASE + 'app.js',
+  BASE + 'fichas-opme.html',
   BASE + 'manifest.json',
   BASE + 'icon.svg',
 ];
@@ -38,10 +39,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  const isLocal = !url.hostname.includes('googleapis') &&
-                  !url.hostname.includes('gstatic') &&
-                  !url.hostname.includes('firebaseapp') &&
-                  !url.hostname.includes('cdnjs');
+  const isLocal = url.origin === self.location.origin;
   if (isLocal && url.pathname.startsWith(BASE)) {
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
