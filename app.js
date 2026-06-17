@@ -421,15 +421,6 @@ function autoTransitoNF(nfValue) {
     }
 }
 
-function autoPreencherRetiradaColeta(dataCirurgia) {
-    if (!dataCirurgia) return;
-    const d = new Date(dataCirurgia + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    const retirada = d.toISOString().slice(0, 10);
-    const campo = document.getElementById('f-data-retirar');
-    if (campo) campo.value = retirada;
-}
-
 async function save() {
     // Operações já salvas diretamente no Firebase — onSnapshot atualiza a UI
 }
@@ -3295,15 +3286,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window._prodMap = _prodMap;
 });
 
-
-function autoRetirada(dataCirurgia) {
-    if (!dataCirurgia) return;
-    const d = new Date(dataCirurgia + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    const retirada = d.toISOString().slice(0, 10);
-    const campo = document.getElementById('f-retirada');
-    if (campo) campo.value = retirada;
-}
 
 function toggleOutroHospital(valor) {
     const grp = document.getElementById('g-outro-hospital');
