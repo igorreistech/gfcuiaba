@@ -362,8 +362,12 @@ tbody tr:hover .row-acts{opacity:1}
         <div class="fg"><label class="flbl">Hospital</label><input class="finput" id="f-hosp" placeholder="Nome do hospital" list="dl-hospital"><datalist id="dl-hospital"></datalist></div>
       </div>
       <div class="frow">
+        <div class="fg"><label class="flbl">Cliente de Faturação</label><input class="finput" id="f-cliente" placeholder="Cliente para faturar" list="dl-cliente"><datalist id="dl-cliente"></datalist></div>
         <div class="fg"><label class="flbl">Convênio</label><input class="finput" id="f-conv" placeholder="Ex: Unimed, SUS…" list="dl-convenio"><datalist id="dl-convenio"></datalist></div>
+      </div>
+      <div class="frow">
         <div class="fg"><label class="flbl">Nº Pedido de Venda</label><input class="finput" id="f-pedido" placeholder="Ex: 4795"></div>
+        <div class="fg"></div>
       </div>
       <div class="frow">
         <div class="fg"><label class="flbl">Data da Cirurgia</label><input class="finput" type="date" id="f-data"></div>
@@ -788,6 +792,7 @@ window.abrirModal = id => {
     document.getElementById('f-med').value    = f.medico||'';
     document.getElementById('f-proc').value   = f.procedimento||'';
     document.getElementById('f-hosp').value   = f.hospital||'';
+    document.getElementById('f-cliente').value = f.cliente||'';
     document.getElementById('f-conv').value   = f.convenio||'';
     document.getElementById('f-pedido').value = f.numeroPedido||'';
     document.getElementById('f-data').value   = f.dataCirurgia||'';
@@ -826,6 +831,7 @@ window.salvarFicha = async () => {
   const total=iv.reduce((s,i)=>s+(Number(i.precoUnit)||0)*(Number(i.qtd)||0),0);
   const dados={paciente:pac,medico:med,procedimento:proc,
     hospital:document.getElementById('f-hosp').value.trim(),
+    cliente:document.getElementById('f-cliente').value.trim()||document.getElementById('f-hosp').value.trim(),
     convenio:document.getElementById('f-conv').value.trim(),
     numeroPedido:document.getElementById('f-pedido').value.trim(),
     dataCirurgia:document.getElementById('f-data').value,
@@ -1131,6 +1137,7 @@ function preencherDeC160(d){
   if(d.paciente)document.getElementById('f-pac').value=d.paciente;
   if(d.medico)document.getElementById('f-med').value=d.medico;
   if(d.hospital)document.getElementById('f-hosp').value=d.hospital;
+  if(d.hospital)document.getElementById('f-cliente').value=d.hospital;
   if(d.convenio)document.getElementById('f-conv').value=d.convenio;
   if(d.numeroPedido)document.getElementById('f-pedido').value=d.numeroPedido;
   if(d.dataCirurgia)document.getElementById('f-data').value=d.dataCirurgia;
@@ -1160,6 +1167,12 @@ function toast(msg,tipo='ok'){
 }
 
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))fecharModal();});
+
+// Sincronização: Hospital → Cliente (auto-preencher cliente com hospital se vazio)
+document.getElementById('f-hosp').addEventListener('change',()=>{
+  const clienteInput=document.getElementById('f-cliente');
+  if(!clienteInput.value.trim()){clienteInput.value=document.getElementById('f-hosp').value;}
+});
 </script>
 </body>
 </html>
