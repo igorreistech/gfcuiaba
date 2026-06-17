@@ -1,11 +1,103 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /procedimentos_cba/{docId} {
-      allow read, write: if request.auth != null;
+    function signedIn() {
+      return request.auth != null;
     }
+
+    function adminEmail() {
+      return signedIn()
+        && request.auth.token.email in [
+          'comercial@gfmedical.net',
+          'comercialmt@gfmedical.net'
+        ];
+    }
+
+    function uidUserPath() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+
+    function emailUserPath() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.token.email);
+    }
+
+    function hasUidProfile() {
+      return signedIn() && exists(uidUserPath());
+    }
+
+    function hasEmailProfile() {
+      return signedIn()
+        && request.auth.token.email != null
+        && exists(emailUserPath());
+    }
+
+    function hasUserProfile() {
+      return hasUidProfile() || hasEmailProfile();
+    }
+
+    function uidProfile() {
+      return get(uidUserPath()).data;
+    }
+
+    function emailProfile() {
+      return get(emailUserPath()).data;
+    }
+
+    function isAdmin() {
+      return adminEmail()
+        || (hasUidProfile() && uidProfile().role == 'admin')
+        || (hasEmailProfile() && emailProfile().role == 'admin');
+    }
+
+    function isAgendador() {
+      return (hasUidProfile() && uidProfile().role == 'agendador')
+        || (hasEmailProfile() && emailProfile().role == 'agendador');
+    }
+
+    function isOwnProcedure(data) {
+      return signedIn() && data.cadastradoPor == request.auth.uid;
+    }
+
+    match /procedimentos_cba/{docId} {
+      allow read: if isAdmin() || (isAgendador() && isOwnProcedure(resource.data));
+      allow create: if isAdmin() || (isAgendador() && isOwnProcedure(request.resource.data));
+      allow update: if isAdmin() || (
+        isAgendador()
+        && isOwnProcedure(resource.data)
+        && isOwnProcedure(request.resource.data)
+      );
+      allow delete: if isAdmin() || (isAgendador() && isOwnProcedure(resource.data));
+    }
+
     match /fichas_opme/{docId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin() || hasUserProfile();
+    }
+
+    match /usuarios/{userId} {
+      allow get: if isAdmin()
+        || (signedIn() && userId == request.auth.uid)
+        || (signedIn() && resource.data.email == request.auth.token.email);
+      allow list: if isAdmin()
+        || (signedIn() && resource.data.email == request.auth.token.email);
+      allow create: if isAdmin() || (
+        signedIn()
+        && userId == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == 'agendador'
+      );
+      allow update: if isAdmin() || (
+        signedIn()
+        && (userId == request.auth.uid || resource.data.email == request.auth.token.email)
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid', 'nome'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /config/{docId} {
+      allow read, write: if isAdmin();
     }
   }
 }

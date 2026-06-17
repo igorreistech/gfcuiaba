@@ -7,23 +7,16 @@
     <meta name="theme-color" content="#0d1f0e">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.jpg">
-    <title>Monitor Cirúrgico · Cuiabá - MT</title>
-    <meta name="description" content="Monitor Cirúrgico GF Medical — Cuiabá, MT. Acompanhamento em tempo real de procedimentos cirúrgicos.">
+    <title>Mapa Cirúrgico Hospitalar · Cuiabá - MT</title>
+    <meta name="description" content="Mapa Cirúrgico Hospitalar GF Medical — Cuiabá, MT. Acompanhamento em tempo real de procedimentos cirúrgicos.">
     <!-- Firebase SDK -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getFirestore, collection, onSnapshot, addDoc, setDoc, deleteDoc, doc, getDoc, getDocs, query, where, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
       import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
       import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyCiPvYsGevYicQejvTsiC1j-64ziG2if58",
-        authDomain: "gfcuiaba-53b8d.firebaseapp.com",
-        projectId: "gfcuiaba-53b8d",
-        storageBucket: "gfcuiaba-53b8d.firebasestorage.app",
-        messagingSenderId: "105939167033",
-        appId: "1:105939167033:web:991387fc634e3d5f0d6ae8"
-      };
+      import { firebaseConfig } from "./firebase-config.js";
+      import { getAutomaticStatusTransition } from "./monitor-domain.js";
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
@@ -31,6 +24,8 @@
       const auth = getAuth(app);
       window._fbAuth = auth;
       const COLL = "procedimentos_cba";
+      const ADMIN_EMAILS_FIXOS = ['comercial@gfmedical.net', 'comercialmt@gfmedical.net'];
+      window._adminEmailsFixos = ADMIN_EMAILS_FIXOS;
 
       window._fbDb = db;
       window._fbColl = COLL;
@@ -64,7 +59,7 @@
         const de   = labels[statusAnterior] || statusAnterior;
         const para = labels[proc.status]    || proc.status;
         const pac  = proc.paciente || 'Paciente';
-        const titulo = proc.status === 'urgencia' ? '🚨 URGÊNCIA — Monitor Cirúrgico' : '🔔 Monitor Cirúrgico';
+        const titulo = proc.status === 'urgencia' ? '🚨 URGÊNCIA — Mapa Cirúrgico' : '🔔 Mapa Cirúrgico';
         try {
           const n = new Notification(titulo, {
             body: `${pac}: ${de} → ${para}`,
@@ -175,14 +170,14 @@
           <div style="background:var(--surface,#fff);border-radius:18px;padding:26px 26px 20px;max-width:380px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,0.3);animation:resumoIn .3s ease;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;">
               <div>
-                <div style="font-family:var(--mono,monospace);font-size:0.65rem;font-weight:700;color:var(--text-dim,#94a3b8);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Monitor Cirúrgico · ${hora}</div>
+                <div style="font-family:var(--mono,monospace);font-size:0.65rem;font-weight:700;color:var(--text-dim,#94a3b8);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Mapa Cirúrgico · ${hora}</div>
                 <div style="font-size:1.1rem;font-weight:700;color:var(--text,#0f172a);">Resumo · ${total} procedimento${total!==1?'s':''}</div>
               </div>
               <button id="resumo-fechar" style="background:rgba(107,114,128,0.1);border:none;border-radius:8px;padding:5px 9px;cursor:pointer;color:var(--text-dim,#6b7280);font-size:0.9rem;">✕</button>
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;max-height:52vh;overflow-y:auto;">${rows}</div>
             <button id="resumo-entrar" style="margin-top:16px;width:100%;padding:11px;border-radius:10px;background:linear-gradient(135deg,#4db87a,#22c55e);border:none;color:#fff;font-family:var(--mono,monospace);font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.07em;">
-              ENTRAR NO MONITOR →
+              ENTRAR NO MAPA →
             </button>
           </div>`;
         const fechar = () => ov.remove();
@@ -219,7 +214,6 @@
         const email  = document.getElementById('regEmail').value.trim();
         const pass   = document.getElementById('regPass').value;
         const pass2  = document.getElementById('regPass2').value;
-        const codigo = (document.getElementById('regCodigo')?.value || '').trim();
         const btn    = document.getElementById('regBtn');
         const err    = document.getElementById('loginError');
         err.style.display = 'none';
@@ -229,15 +223,13 @@
         if (pass !== pass2) { err.textContent = 'As senhas não coincidem.'; err.style.display = 'block'; return; }
         btn.disabled = true; btn.textContent = 'Criando conta...';
         try {
-          let role = 'agendador';
-          if (codigo) {
-            const acessoSnap = await getDoc(doc(db, 'config', 'acesso'));
-            if (acessoSnap.exists() && acessoSnap.data().codigo && acessoSnap.data().codigo === codigo) {
-              role = 'admin';
-            }
-          }
-          const cred = await createUserWithEmailAndPassword(auth, email, pass);
-          await setDoc(doc(db, 'usuarios', cred.user.uid), { email: email.toLowerCase(), nome, role, uid: cred.user.uid });
+          const cred = await createUserWithEmailAndPassword(auth, email.toLowerCase(), pass);
+          await setDoc(doc(db, 'usuarios', cred.user.uid), {
+            email: email.toLowerCase(),
+            nome,
+            role: 'agendador',
+            uid: cred.user.uid
+          });
         } catch(e) {
           let msg = 'Erro ao criar conta.';
           if (e.code === 'auth/email-already-in-use') msg = 'E-mail já cadastrado. Faça login.';
@@ -248,19 +240,14 @@
       };
 
       window.doAdminLoadCodigo = async function() {
-        try {
-          const snap = await getDoc(doc(db, 'config', 'acesso'));
-          const el = document.getElementById('admin-codigo');
-          if (el && snap.exists()) el.value = snap.data().codigo || '';
-        } catch(e) {}
+        const el = document.getElementById('admin-codigo');
+        if (el) {
+          el.value = 'Desativado por segurança';
+          el.disabled = true;
+        }
       };
       window.doAdminSaveCodigo = async function() {
-        const el = document.getElementById('admin-codigo');
-        const codigo = (el?.value || '').trim();
-        try {
-          await setDoc(doc(db, 'config', 'acesso'), { codigo });
-          if (el) { el.style.borderColor = '#87c396'; setTimeout(()=>{ el.style.borderColor=''; }, 1500); }
-        } catch(e) { alert('Erro ao salvar: '+e.message); }
+        alert('A promoção automática por código foi desativada. Cadastre o usuário e ajuste o perfil neste painel.');
       };
 
       window.showRegister = function() {
@@ -426,7 +413,7 @@
         const nome    = (nomeEl?.value||'').trim();
         if (!email) { emailEl?.focus(); return; }
         try {
-          await setDoc(doc(db, 'usuarios', email.replace(/[^a-z0-9]/g,'_')), { email, role, nome: nome||email });
+          await setDoc(doc(db, 'usuarios', email), { email, role, nome: nome||email });
           if (emailEl) emailEl.value = '';
           if (nomeEl)  nomeEl.value  = '';
           doAdminLoadUsers();
@@ -449,43 +436,57 @@
         if (m) m.style.display = 'none';
       };
 
+      async function obterPerfilUsuario(user, isAdminFixo) {
+        const emailLower = (user.email || '').toLowerCase();
+        if (isAdminFixo) {
+          const perfilAdmin = { email: emailLower, nome: user.displayName || user.email, role: 'admin', uid: user.uid };
+          try { await setDoc(doc(db, 'usuarios', user.uid), { ...perfilAdmin }, { merge: true }); } catch(e) {}
+          return perfilAdmin;
+        }
+
+        const perfilPadrao = { email: emailLower, nome: user.displayName || user.email, role: 'agendador', uid: user.uid };
+        try {
+          const snapUid = await getDoc(doc(db, 'usuarios', user.uid));
+          if (snapUid.exists()) return { ...perfilPadrao, ...snapUid.data(), uid: user.uid };
+
+          const qEmail = query(collection(db, 'usuarios'), where('email', '==', emailLower));
+          const snapEmail = await getDocs(qEmail);
+          if (!snapEmail.empty) {
+            const perfilDoc = snapEmail.docs[0];
+            const perfil = { ...perfilPadrao, ...perfilDoc.data(), uid: user.uid };
+            try {
+              await setDoc(doc(db, 'usuarios', perfilDoc.id), {
+                uid: user.uid,
+                nome: perfil.nome || perfilPadrao.nome
+              }, { merge: true });
+            } catch(e2) {}
+            return perfil;
+          }
+
+          await setDoc(doc(db, 'usuarios', user.uid), perfilPadrao);
+          return perfilPadrao;
+        } catch(e) {
+          console.warn('Perfil de usuário:', e);
+          try { await setDoc(doc(db, 'usuarios', user.uid), perfilPadrao, { merge: true }); } catch(e2) {}
+          return perfilPadrao;
+        }
+      }
+
       onAuthStateChanged(auth, (user) => {
         async function aplicarAuth() {
           const overlay = document.getElementById('loginOverlay');
           if (!overlay) { setTimeout(aplicarAuth, 50); return; }
 
-          const ADMIN_EMAILS_FIXOS = ['comercial@gfmedical.net', 'comercialmt@gfmedical.net'];
-
           if (user) {
             const emailLower = (user.email || '').toLowerCase();
             const isAdminFixo = ADMIN_EMAILS_FIXOS.includes(emailLower);
-            let perfil = null;
-            if (isAdminFixo) {
-              perfil = { email: emailLower, nome: user.displayName || user.email, role: 'admin', uid: user.uid };
-              try { await setDoc(doc(db, 'usuarios', user.uid), { ...perfil }); } catch(e) {}
-            } else {
-              try {
-                const snap = await getDoc(doc(db, 'usuarios', user.uid));
-                if (snap.exists()) {
-                  perfil = snap.data();
-                } else {
-                  // Novo usuário via OAuth: auto-cadastra como agendador
-                  perfil = { email: emailLower, nome: user.displayName || user.email, role: 'agendador', uid: user.uid };
-                  await setDoc(doc(db, 'usuarios', user.uid), perfil);
-                }
-              } catch(e) { perfil = null; }
-            }
-
-            // Garante que sempre há um perfil válido (somente para não-admins)
-            if (!perfil) {
-              perfil = { email: emailLower, nome: user.displayName || user.email, role: 'agendador', uid: user.uid };
-              try { await setDoc(doc(db, 'usuarios', user.uid), perfil, { merge: true }); } catch(e2) {}
-            }
+            let perfil = await obterPerfilUsuario(user, isAdminFixo);
 
             // Segurança final: emails fixos SEMPRE são admin, nunca agendador
             if (isAdminFixo) perfil.role = 'admin';
 
             window._currentUser = { uid: user.uid, email: user.email, nome: perfil.nome || user.displayName || user.email, role: perfil.role };
+            window._restartProcedimentosListener && window._restartProcedimentosListener();
             overlay.classList.add('hidden');
             const logoutEl  = document.getElementById('logoutBtn');
             const adminBtn  = document.getElementById('btn-gerenciar-usuarios');
@@ -515,6 +516,8 @@
             }
           } else {
             window._currentUser = null;
+            window._stopProcedimentosListener && window._stopProcedimentosListener();
+            if (window.procedimentos) window.procedimentos.splice(0, window.procedimentos.length);
             overlay.classList.remove('hidden');
             const logoutEl  = document.getElementById('logoutBtn');
             const adminBtn  = document.getElementById('btn-gerenciar-usuarios');
@@ -529,20 +532,24 @@
         aplicarAuth();
       });
 
-      // Garante que config/acesso existe com código padrão na primeira execução
-      (async () => {
-        try {
-          const acessoRef = doc(db, 'config', 'acesso');
-          const acessoSnap = await getDoc(acessoRef);
-          if (!acessoSnap.exists()) {
-            await setDoc(acessoRef, { codigo: '140424' });
-          }
-        } catch(e) {}
-      })();
+      window._stopProcedimentosListener = function() {
+        if (window._procedimentosUnsubscribe) {
+          window._procedimentosUnsubscribe();
+          window._procedimentosUnsubscribe = null;
+        }
+      };
 
-      window.addEventListener('DOMContentLoaded', () => {
-        const { collection: col, onSnapshot: snap } = window._fbModules;
-        snap(col(db, COLL), (snapshot) => {
+      window._restartProcedimentosListener = function() {
+        const user = window._currentUser;
+        if (!user) return;
+        window._stopProcedimentosListener();
+
+        const { collection: col, onSnapshot: snap, query: q, where: wh } = window._fbModules;
+        const origem = user.role === 'agendador'
+          ? q(col(db, COLL), wh('cadastradoPor', '==', user.uid))
+          : col(db, COLL);
+
+        window._procedimentosUnsubscribe = snap(origem, (snapshot) => {
           const dados = snapshot.docs.map(d => ({ _docId: d.id, ...d.data() }));
 
           // ─── Detectar mudanças de status e notificar ───
@@ -565,56 +572,45 @@
             if (!window.renderCards) { setTimeout(aplicar, 50); return; }
             if (!document.getElementById('procTable')) { setTimeout(aplicar, 50); return; }
             try {
-                            // Auto-status por data de cirurgia:
-              // - Agendado + véspera (D-1) → Em Separação (automático)
-              // - Em Separação ou Em Trânsito + hoje é a cirurgia → pede confirmação para Em Procedimento
+              // Auto-status por data de cirurgia roda apenas na visão admin para evitar
+              // escritas concorrentes entre vários clientes com permissões diferentes.
               const hoje = new Date().toISOString().split('T')[0];
               const amanhaD = new Date(); amanhaD.setDate(amanhaD.getDate() + 1);
               const amanha = amanhaD.getFullYear() + '-' + String(amanhaD.getMonth()+1).padStart(2,'0') + '-' + String(amanhaD.getDate()).padStart(2,'0');
 
               if (!window._confirmacaoInicioFeita) window._confirmacaoInicioFeita = new Set();
+              if (!window._autoTransicoesPendentes) window._autoTransicoesPendentes = new Set();
+              const podeAutoTransitar = window._currentUser && window._currentUser.role === 'admin';
 
-              function autoTransitar(p, statusAnterior) {
+              function autoTransitar(p, statusAnterior, motivo) {
+                if (!podeAutoTransitar || !p._docId || window._autoTransicoesPendentes.has(p._docId)) return;
                 p.autoTransicaoEm = new Date().toISOString();
+                p.autoTransicaoMotivo = motivo || 'auto_status';
+                window._autoTransicoesPendentes.add(p._docId);
                 try { notificarMudancaStatus(p, statusAnterior); } catch(e3) {}
                 try {
                   const { setDoc: sd, doc: docFn } = window._fbModules;
-                  if (p._docId) sd(docFn(db, COLL, p._docId), { ...p });
+                  sd(docFn(db, COLL, p._docId), {
+                    status: p.status,
+                    autoTransicaoEm: p.autoTransicaoEm,
+                    autoTransicaoMotivo: p.autoTransicaoMotivo
+                  }, { merge: true }).finally(() => window._autoTransicoesPendentes.delete(p._docId));
                 } catch(e2) { console.warn('Auto-status:', e2); }
               }
 
               const paraPromover = [];
               dados.forEach(p => {
-                // Em Trânsito sem NF → Em Separação (NF obrigatória para manter em trânsito)
-                if (p.status === 'em_transito' && (!p.nf || !p.nf.trim())) {
-                  p.status = 'preparacao';
-                  autoTransitar(p, 'em_transito');
+                if (podeAutoTransitar) {
+                  const transicao = getAutomaticStatusTransition(p, hoje, amanha);
+                  if (transicao) {
+                    p.status = transicao.status;
+                    autoTransitar(p, transicao.from, transicao.reason);
+                  }
                 }
 
-                // Agendado + véspera (D-1) → Em Separação (silencioso)
-                if (p.status === 'agendado' && p.data && p.data === amanha) {
-                  p.status = 'preparacao';
-                  autoTransitar(p, 'agendado');
-                }
-                // Em Separação ou Em Trânsito + dia da cirurgia → pede confirmação
-                else if ((p.status === 'preparacao' || p.status === 'em_transito') && p.data && p.data === hoje
-                         && !window._confirmacaoInicioFeita.has(p._docId)) {
+                if (podeAutoTransitar && (p.status === 'preparacao' || p.status === 'em_transito') && p.data && p.data === hoje
+                    && !window._confirmacaoInicioFeita.has(p._docId)) {
                   paraPromover.push(p);
-                }
-
-                // Data de retirada = hoje → Aguardando Retirada (automático)
-                if (!['a_retirar','concluido','cancelado','andamento','urgencia','coleta_urgente'].includes(p.status)
-                    && (p.retirada || p.dataRetirar) === hoje) {
-                  const prev = p.status;
-                  p.status = 'a_retirar';
-                  autoTransitar(p, prev);
-                }
-
-                // Em Procedimento + data de retirada chegou → Aguardando Retirada (automático)
-                if (p.status === 'andamento' && (p.retirada || p.dataRetirar) && (p.retirada || p.dataRetirar) <= hoje) {
-                  const prev = p.status;
-                  p.status = 'a_retirar';
-                  autoTransitar(p, prev);
                 }
               });
 
@@ -637,11 +633,15 @@
             } catch(e) { console.error('Erro ao aplicar dados:', e); }
           }
           aplicar();
+        }, (error) => {
+          console.error('Firestore sync:', error);
+          window.showSyncToast && window.showSyncToast('Erro ao sincronizar dados. Verifique suas permissões.');
         });
-      });
+      };
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="pwa-register.js" defer></script>
 </head>
 <body>
 
@@ -650,7 +650,7 @@
     <div class="login-box">
         <img class="login-logo-img" src="logo.jpg" alt="GF Medical">
         <div class="login-logo">⬡ GF Medical</div>
-        <div class="login-sub">Monitor Cirúrgico · Cuiabá, MT</div>
+        <div class="login-sub">Mapa Cirúrgico Hospitalar · Cuiabá, MT</div>
 
         <!-- Painel de login -->
         <div id="loginPanel">
@@ -696,8 +696,8 @@
                     <input class="login-input" type="password" id="regPass2" placeholder="Repita a senha" autocomplete="new-password">
                 </div>
                 <div class="login-group">
-                    <label class="login-label">Código de acesso <span style="font-size:0.75em;opacity:0.65;">(opcional)</span></label>
-                    <input class="login-input" type="text" id="regCodigo" placeholder="Se tiver um código, informe aqui" autocomplete="off">
+                    <label class="login-label">Perfil inicial</label>
+                    <input class="login-input" type="text" id="regCodigo" value="Agendador — aprovação de admin para acesso completo" autocomplete="off" disabled>
                 </div>
                 <button type="submit" class="login-btn" id="regBtn">Criar conta</button>
             </form>
@@ -726,7 +726,7 @@
         <div class="agendador-brand">
             <div>
                 <div class="agendador-brand-logo">⬡ GF Medical</div>
-                <div class="agendador-brand-sub">Monitor Cirúrgico · Cuiabá</div>
+                <div class="agendador-brand-sub">Mapa Cirúrgico Hospitalar · Cuiabá</div>
             </div>
         </div>
         <div class="agendador-user-info">
@@ -765,11 +765,11 @@
             <button class="admin-add-btn" onclick="doAdminAddUser()">Adicionar Usuário</button>
         </div>
         <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:8px;">Código de Acesso Completo</div>
-            <div style="font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Novos usuários que informarem este código no cadastro recebem acesso completo ao monitor.</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:8px;">Acesso administrativo</div>
+            <div style="font-family:var(--mono);font-size:0.75rem;color:var(--text-dim);margin-bottom:12px;">Por segurança, novos usuários entram como agendador. Promova usuários neste painel quando precisarem de acesso completo.</div>
             <div style="display:flex;gap:10px;align-items:center;">
-                <input class="admin-add-input" type="text" id="admin-codigo" placeholder="Defina um código..." style="flex:1;">
-                <button class="admin-add-btn" onclick="doAdminSaveCodigo()" style="padding:10px 18px;white-space:nowrap;border-radius:9px;font-size:0.88rem;">Salvar</button>
+                <input class="admin-add-input" type="text" id="admin-codigo" placeholder="Promoção por código desativada" style="flex:1;">
+                <button class="admin-add-btn" onclick="doAdminSaveCodigo()" style="padding:10px 18px;white-space:nowrap;border-radius:9px;font-size:0.88rem;">Entendi</button>
             </div>
         </div>
         <button class="admin-close-btn" onclick="closeAdminModal()">Fechar</button>
@@ -785,7 +785,7 @@
                 <img class="header-logo" src="logo.jpg" alt="GF Medical">
             </div>
             <div class="header-text">
-                <h1>Monitor Cirúrgico</h1>
+                <h1>Mapa Cirúrgico Hospitalar</h1>
                 <p>Acompanhamento em tempo real · Cuiabá, MT</p>
             </div>
         </div>
@@ -6170,7 +6170,7 @@
     const tipo = inferirTipo(p);
     const prazo = getSlaInfo(p);
     const linhas = [
-      '*Monitor Cirúrgico 2.0*',
+      '*Mapa Cirúrgico Hospitalar*',
       '',
       `Paciente: ${p.paciente || '—'}`,
       `Hospital: ${p.hospital || '—'}`,
@@ -6482,7 +6482,7 @@
       </div>`;
   }
   function enhanceLabels(){
-    const t = document.title; if(t) document.title = t.replace('Monitor Cirúrgico','Mapa Cirúrgico Hospitalar');
+    if(document.title) document.title = 'Mapa Cirúrgico Hospitalar · Cuiabá - MT';
     const h1 = document.querySelector('.header-text h1'); if(h1) h1.textContent = 'Mapa Cirúrgico Hospitalar';
     const p = document.querySelector('.header-text p'); if(p) p.textContent = 'Central operacional · Cuiabá/MT · GF Medical';
     const btnTable = document.getElementById('tab-table'); if(btnTable) btnTable.textContent = '🧭 Central Cirúrgica';
@@ -8019,7 +8019,7 @@ async function solicitarPermissaoNotificacao() {
     if (Notification.permission === 'default') {
         const perm = await Notification.requestPermission();
         if (perm === 'granted') {
-            new Notification('✈️ Monitor Cirúrgico', {
+            new Notification('✈️ Mapa Cirúrgico', {
                 body: 'Notificações de Coleta Prioritária ativadas!',
                 icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">✈️</text></svg>'
             });
@@ -8254,7 +8254,7 @@ window.exportarWhatsAppColeta = function() {
         if (p.coletaDataCirurgia) linhas.push(`   🗓 Cirurgia: ${fmt(p.coletaDataCirurgia)}${p.coletaHoraCirurgia?' às '+p.coletaHoraCirurgia:''}`);
         linhas.push('');
     });
-    linhas.push('_Enviado pelo Monitor Cirúrgico GF Medical_');
+    linhas.push('_Enviado pelo Mapa Cirúrgico Hospitalar GF Medical_');
     _abrirWhatsApp(linhas.join('\n'));
 };
 
@@ -9549,7 +9549,7 @@ function _agendarLembretes(){
             if(t>0&&t<86400000){
                 setTimeout(()=>{
                     if(Notification.permission==='granted'){
-                        new Notification('⏰ Lembrete — Monitor Cirúrgico',{body:`${proc.paciente||proc.hospital||'—'}: ${l.msg}`,tag:'lembrete-'+proc._docId+'-'+l.em});
+                        new Notification('⏰ Lembrete — Mapa Cirúrgico',{body:`${proc.paciente||proc.hospital||'—'}: ${l.msg}`,tag:'lembrete-'+proc._docId+'-'+l.em});
                     }else{
                         window.showSyncToast&&window.showSyncToast('⏰ Lembrete: '+l.msg);
                     }
@@ -9938,8 +9938,8 @@ window.enviarRelatorioEmail=function(){
     if(urg.length){c+=`URGÊNCIAS\n${urg.map(p=>`• ${p.paciente||p.hospital||'—'} (${p.medico||'—'})`).join('\n')}\n\n`;}
     if(hj.length){c+=`CIRURGIAS HOJE\n${hj.map(p=>`• ${p.paciente||p.hospital||'—'} — ${p.inicio||'—'} — ${p.medico||'—'}`).join('\n')}\n\n`;}
     if(reag.length){c+=`REAGENDADOS (cobrar)\n${reag.map(p=>`• ${p.paciente||p.hospital||'—'} — ${fmt(p.data)} — ${p.vendedor||'—'}`).join('\n')}\n\n`;}
-    c+=`Enviado pelo Monitor Cirúrgico GF Medical`;
-    const assunto=encodeURIComponent(`Monitor Cirúrgico — Relatório ${new Date().toLocaleDateString('pt-BR')}`);
+    c+=`Enviado pelo Mapa Cirúrgico Hospitalar GF Medical`;
+    const assunto=encodeURIComponent(`Mapa Cirúrgico — Relatório ${new Date().toLocaleDateString('pt-BR')}`);
     window.open(`mailto:?subject=${assunto}&body=${encodeURIComponent(c)}`);
 };
 

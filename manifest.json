@@ -1,8 +1,8 @@
 {
   "lang": "pt-BR",
-  "name": "Monitor Cirúrgico · Cuiabá",
-  "short_name": "Monitor CBA",
-  "description": "Acompanhamento cirúrgico em tempo real · Cuiabá, MT",
+  "name": "Mapa Cirúrgico Hospitalar · Cuiabá",
+  "short_name": "Mapa CBA",
+  "description": "Mapa cirúrgico hospitalar em tempo real · Cuiabá, MT",
   "start_url": ".",
   "scope": "./",
   "display": "standalone",
