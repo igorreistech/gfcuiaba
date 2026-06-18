@@ -1,21 +1,1248 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=./#projetos">
-    <meta name="robots" content="noindex">
-    <title>Redirecionando para o portfólio</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Fichas OPME · GF Medical · Cuiabá</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#e8f5ee;--surface:#f0faf3;--surface2:#d8f0e0;--surface3:#c2e6ce;
+  --border:#b8dfc4;--border2:#8abfa0;--accent:#1a7a4a;--accent2:#2a9fbf;--accent3:#4db87a;
+  --text:#0a2a18;--text2:#2a5a3a;--text3:#5a8a6a;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--display:'Space Grotesk',sans-serif;
+  --radius:10px;--shadow:0 2px 12px rgba(10,42,24,0.08);--shadow-md:0 4px 24px rgba(10,42,24,0.12);
+  --s0-c:#6b7280;--s0-bg:rgba(107,114,128,0.10);--s0-bd:rgba(107,114,128,0.25);
+  --s1-c:#2a9fbf;--s1-bg:rgba(42,159,191,0.10);--s1-bd:rgba(42,159,191,0.25);
+  --s2-c:#9333ea;--s2-bg:rgba(147,51,234,0.10);--s2-bd:rgba(147,51,234,0.25);
+  --s3-c:#d4920a;--s3-bg:rgba(212,146,10,0.10);--s3-bd:rgba(212,146,10,0.25);
+  --s4-c:#f97316;--s4-bg:rgba(249,115,22,0.10);--s4-bd:rgba(249,115,22,0.25);
+  --s5-c:#1a7a4a;--s5-bg:rgba(26,122,74,0.10);--s5-bd:rgba(26,122,74,0.25);
+}
+html{font-size:15px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(26,122,74,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(26,122,74,0.055) 1px,transparent 1px);
+  background-size:48px 48px}
+.app{display:flex;min-height:100vh;position:relative;z-index:1}
+.sidebar{width:224px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;box-shadow:var(--shadow)}
+.sidebar-logo{padding:15px 16px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:8px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.logo-text strong{display:block;font-family:var(--display);font-size:0.84rem;font-weight:700;color:var(--text)}
+.logo-text span{font-family:var(--mono);font-size:0.57rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase}
+.sidebar-inner{padding:10px 8px;flex:1;display:flex;flex-direction:column;overflow-y:auto}
+.slabel{font-family:var(--mono);font-size:0.57rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);padding:6px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--text2);text-decoration:none;transition:all 0.13s;margin-bottom:1px;border:1px solid transparent}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(26,122,74,0.09);color:var(--accent);border-color:rgba(26,122,74,0.15)}
+.nav-icon{font-size:0.9rem;width:18px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;color:white;font-family:var(--mono);font-size:0.57rem;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
+.nb0{background:var(--s0-c)}.nb1{background:var(--s1-c)}.nb2{background:var(--s2-c)}.nb3{background:var(--s3-c)}.nb4{background:var(--s4-c)}.nb5{background:var(--s5-c)}
+.sdiv{height:1px;background:var(--border);margin:7px 0}
+.sidebar-footer{padding:10px;border-top:1px solid var(--border)}
+.user-chip{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:0.62rem;font-weight:700;color:white;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-info strong{display:block;font-size:0.72rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-info span{font-family:var(--mono);font-size:0.57rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em}
+.ftag{font-family:var(--mono);font-size:0.57rem;padding:2px 6px;border-radius:4px;background:rgba(42,159,191,0.10);color:var(--accent2);border:1px solid rgba(42,159,191,0.20);flex-shrink:0}
+.main{margin-left:224px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.page-title{font-family:var(--display);font-size:0.92rem;font-weight:700;color:var(--text);margin-right:auto}
+.sbox{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:6px 11px;width:230px;transition:border-color 0.14s}
+.sbox:focus-within{border-color:var(--accent)}
+.sbox input{border:none;outline:none;background:transparent;font-family:var(--sans);font-size:0.78rem;color:var(--text);flex:1}
+.sbox input::placeholder{color:var(--text3)}
+.tbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);font-family:var(--sans);font-size:0.75rem;font-weight:600;cursor:pointer;border:none;transition:all 0.13s}
+.tbtn-p{background:var(--accent);color:white}.tbtn-p:hover{background:#155e3a}
+.tbtn-g{background:transparent;color:var(--text2);border:1px solid var(--border)}.tbtn-g:hover{background:var(--surface2)}
+.vtabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 18px}
+.vtab{display:flex;align-items:center;gap:5px;padding:9px 14px;font-size:0.76rem;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.13s}
+.vtab:hover{color:var(--text)}.vtab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.page-content{padding:18px;flex:1}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-size:0.6rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;border:1px solid}
+.b0{color:var(--s0-c);background:var(--s0-bg);border-color:var(--s0-bd)}.b1{color:var(--s1-c);background:var(--s1-bg);border-color:var(--s1-bd)}
+.b2{color:var(--s2-c);background:var(--s2-bg);border-color:var(--s2-bd)}.b3{color:var(--s3-c);background:var(--s3-bg);border-color:var(--s3-bd)}
+.b4{color:var(--s4-c);background:var(--s4-bg);border-color:var(--s4-bd)}
+.b5{color:var(--s5-c);background:var(--s5-bg);border-color:var(--s5-bd)}
+.stats-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform 0.13s;position:relative;overflow:hidden}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc0::before{background:var(--s0-c)}.sc1::before{background:var(--s1-c)}.sc2::before{background:var(--s2-c)}.sc3::before{background:var(--s3-c)}.sc4::before{background:var(--s4-c)}.sc5::before{background:var(--s5-c)}
+.stat-lbl{font-family:var(--mono);font-size:0.57rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.stat-val{font-family:var(--display);font-size:1.7rem;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:0.65rem;color:var(--text3);margin-top:2px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.dcard-head{padding:11px 15px;border-bottom:1px solid var(--border);background:var(--surface2);font-family:var(--display);font-size:0.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.dcard-body{padding:14px}
+.funnel{display:flex;flex-direction:column;gap:6px}
+.funnel-row{display:flex;align-items:center;gap:10px}
+.funnel-name{font-size:0.72rem;color:var(--text2);width:100px;flex-shrink:0}
+.funnel-track{flex:1;height:20px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.funnel-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;transition:width 0.5s}
+.funnel-fill span{font-family:var(--mono);font-size:0.6rem;font-weight:600;color:white;text-shadow:0 1px 2px rgba(0,0,0,0.2)}
+.funnel-count{font-family:var(--mono);font-size:0.65rem;color:var(--text3);width:18px;text-align:right;flex-shrink:0}
+.ff0{background:var(--s0-c)}.ff1{background:var(--s1-c)}.ff2{background:var(--s2-c)}.ff3{background:var(--s3-c)}.ff4{background:var(--s4-c)}.ff5{background:var(--s5-c)}
+.act-list{display:flex;flex-direction:column}
+.act-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.act-info{flex:1;min-width:0}
+.act-name{font-size:0.76rem;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-desc{font-size:0.68rem;color:var(--text3)}
+.act-time{font-family:var(--mono);font-size:0.6rem;color:var(--text3);flex-shrink:0}
+.kanban-board{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:start}
+.kcol{border-radius:var(--radius);overflow:hidden}
+.kcol-head{padding:9px 11px;display:flex;align-items:center;gap:6px;font-family:var(--display);font-size:0.75rem;font-weight:700;border-radius:var(--radius) var(--radius) 0 0;border:1px solid;border-bottom:none}
+.kh0{background:var(--s0-bg);border-color:var(--s0-bd);color:var(--s0-c)}.kh1{background:var(--s1-bg);border-color:var(--s1-bd);color:var(--s1-c)}
+.kh2{background:var(--s2-bg);border-color:var(--s2-bd);color:var(--s2-c)}.kh3{background:var(--s3-bg);border-color:var(--s3-bd);color:var(--s3-c)}
+.kh4{background:var(--s4-bg);border-color:var(--s4-bd);color:var(--s4-c)}
+.kh5{background:var(--s5-bg);border-color:var(--s5-bd);color:var(--s5-c)}
+.kcnt{font-family:var(--mono);font-size:0.6rem;font-weight:600;padding:2px 6px;border-radius:20px;margin-left:auto;color:white}
+.cnt0{background:var(--s0-c)}.cnt1{background:var(--s1-c)}.cnt2{background:var(--s2-c)}.cnt3{background:var(--s3-c)}.cnt4{background:var(--s4-c)}.cnt5{background:var(--s5-c)}
+.kcol-body{min-height:160px;padding:7px;display:flex;flex-direction:column;gap:7px;border:1px solid;border-top:none;border-radius:0 0 var(--radius) var(--radius)}
+.kb0{background:rgba(107,114,128,0.03);border-color:var(--s0-bd)}.kb1{background:rgba(42,159,191,0.03);border-color:var(--s1-bd)}
+.kb2{background:rgba(147,51,234,0.03);border-color:var(--s2-bd)}.kb3{background:rgba(212,146,10,0.03);border-color:var(--s3-bd)}
+.kb4{background:rgba(249,115,22,0.03);border-color:var(--s4-bd)}
+.kb5{background:rgba(26,122,74,0.03);border-color:var(--s5-bd)}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 11px;box-shadow:var(--shadow);transition:all 0.14s;cursor:grab}
+.kcard:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kcard-pac{font-family:var(--display);font-size:0.76rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.kcard-proc{font-size:0.68rem;color:var(--text3);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard-bot{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.kcard-data{font-family:var(--mono);font-size:0.6rem;color:var(--text3)}
+.kcard-conv{font-family:var(--mono);font-size:0.57rem;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--s1-bg);color:var(--s1-c);border:1px solid var(--s1-bd);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard-filial{font-family:var(--mono);font-size:0.55rem;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:4px}
+.fc-cg{background:rgba(26,122,74,0.12);color:var(--accent);border:1px solid rgba(26,122,74,0.2)}
+.fc-cba{background:rgba(42,159,191,0.12);color:var(--accent2);border:1px solid rgba(42,159,191,0.2)}
+.kcard-actions{display:flex;gap:3px;padding-top:7px;border-top:1px solid var(--border)}
+.kbtn{flex:1;padding:4px;border-radius:5px;border:1px solid;cursor:pointer;font-family:var(--mono);font-size:0.56rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;text-align:center;transition:all 0.13s;background:transparent}
+.kbtn:hover{opacity:0.8}
+.fbar{display:flex;align-items:center;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.flabel{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3)}
+.fchip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all 0.13s}
+.fchip:hover{border-color:var(--accent);color:var(--accent)}.fchip.on{background:rgba(26,122,74,0.08);border-color:var(--accent);color:var(--accent)}
+.fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fbtn{padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all 0.13s}
+.fbtn:hover{border-color:var(--accent);color:var(--accent)}.fdiv{width:1px;height:16px;background:var(--border)}
+.twrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.thead-bar{display:flex;align-items:center;padding:11px 15px;border-bottom:1px solid var(--border);background:var(--surface2);gap:8px}
+.thead-title{font-family:var(--display);font-size:0.8rem;font-weight:700;color:var(--text)}
+.tcount{font-family:var(--mono);font-size:0.6rem;color:var(--text3);background:var(--bg);border:1px solid var(--border);padding:2px 7px;border-radius:10px}
+table{width:100%;border-collapse:collapse}
+thead tr{background:rgba(26,122,74,0.025)}
+th{font-family:var(--mono);font-size:0.57rem;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);padding:8px 13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(26,122,74,0.03)}
+tfoot tr td{border-top:2px solid var(--border2)}
+td{padding:10px 13px;font-size:0.77rem;color:var(--text2);vertical-align:middle}
+.td-pac{font-family:var(--display);font-size:0.78rem;font-weight:600;color:var(--text)}
+.td-trunc{max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.td-mono{font-family:var(--mono);font-size:0.67rem;color:var(--text3);white-space:nowrap}
+.iflow{display:flex;align-items:center;gap:2px}
+.iflow-btn{padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:0.55rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;color:var(--text3);transition:all 0.13s;white-space:nowrap}
+.iflow-btn:hover{border-color:var(--accent);color:var(--accent)}
+.iflow-btn.cur{color:white;border-color:transparent}
+.cur0{background:var(--s0-c)}.cur1{background:var(--s1-c)}.cur2{background:var(--s2-c)}.cur3{background:var(--s3-c)}.cur4{background:var(--s4-c)}.cur5{background:var(--s5-c)}
+.iflow-arr{color:var(--border2);font-size:0.6rem;padding:0 1px}
+.row-acts{display:flex;gap:3px;opacity:0;transition:opacity 0.12s}
+tbody tr:hover .row-acts{opacity:1}
+.abtn{width:25px;height:25px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:0.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+.abtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(26,122,74,0.05)}
+.abtn.del:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.05)}
+.modal-ov{position:fixed;inset:0;background:rgba(10,42,24,0.42);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal-ov.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:660px;box-shadow:var(--shadow-md);overflow:hidden;max-height:calc(100vh - 40px);display:flex;flex-direction:column;animation:mIn 0.2s ease}
+@keyframes mIn{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
+.mhead{padding:15px 19px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);flex-shrink:0}
+.mtitle{font-family:var(--display);font-size:0.9rem;font-weight:700;color:var(--text)}
+.mclose{width:25px;height:25px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.12s}
+.mclose:hover{background:var(--surface3)}
+.mbody{padding:18px;overflow-y:auto;flex:1}
+.mfoot{padding:13px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:8px;background:var(--surface2);flex-shrink:0}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.frow.full{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column;gap:4px}
+.flbl{font-family:var(--mono);font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3)}
+.finput{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-family:var(--sans);font-size:0.78rem;color:var(--text);outline:none;transition:border-color 0.13s}
+.finput:focus{border-color:var(--accent);background:var(--surface)}
+.finput::placeholder{color:var(--text3)}
+.uploads-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.uzone{border:2px dashed var(--border2);border-radius:var(--radius);padding:14px 12px;text-align:center;cursor:pointer;transition:all 0.13s;background:rgba(26,122,74,0.02);position:relative}
+.uzone:hover{border-color:var(--accent);background:rgba(26,122,74,0.04)}
+.uzone.has-file{border-style:solid;border-color:var(--accent);background:rgba(26,122,74,0.06)}
+.uzone-pv{border-color:var(--s1-bd)!important;background:rgba(42,159,191,0.03)!important}
+.uzone-pv:hover{border-color:var(--s1-c)!important;background:rgba(42,159,191,0.06)!important}
+.uzone-pv.has-file{border-style:solid;border-color:var(--s1-c)!important;background:rgba(42,159,191,0.08)!important}
+.uzone-icon{font-size:1.4rem;margin-bottom:4px}
+.uzone-label{font-family:var(--mono);font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;font-weight:600;color:var(--accent)}
+.uzone-pv .uzone-label{color:var(--s1-c)}
+.uzone-title{font-family:var(--display);font-size:0.75rem;font-weight:600;color:var(--text2);margin-bottom:2px}
+.uzone-sub{font-size:0.62rem;color:var(--text3)}
+.uzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-preview{display:none;align-items:center;gap:6px;margin-top:6px;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.7);border:1px solid var(--border)}
+.file-preview.show{display:flex}
+.fp-name{font-size:0.65rem;font-weight:500;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-size{font-family:var(--mono);font-size:0.6rem;color:var(--text3);flex-shrink:0}
+.fp-remove{background:none;border:none;cursor:pointer;color:var(--text3);font-size:0.78rem;padding:0 2px;transition:color 0.12s;flex-shrink:0}
+.fp-remove:hover{color:#ef4444}
+.import-badge{display:none;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:rgba(26,122,74,0.1);border:1px solid rgba(26,122,74,0.2);color:var(--accent);font-family:var(--mono);font-size:0.6rem;font-weight:600;margin-top:4px}
+.import-badge.show{display:inline-flex}
+.itens-section{margin-bottom:14px}
+.itens-hdr{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.item-row{display:grid;grid-template-columns:3fr 1.2fr 1fr 0.8fr 0.9fr 28px;gap:6px;align-items:center;margin-bottom:5px}
+.item-row .finput{padding:6px 9px;font-size:0.76rem}
+.item-row input[type=number]{font-family:var(--mono);font-size:0.82rem;text-align:center}
+.item-rm{background:none;border:1px solid var(--border);color:var(--text3);border-radius:6px;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.12s}
+.item-rm:hover{border-color:#ef4444;color:#ef4444}
+.add-item{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;border:1.5px dashed var(--border2);background:transparent;color:var(--text3);font-family:var(--mono);font-size:0.68rem;font-weight:600;cursor:pointer;transition:all 0.13s;margin-top:3px}
+.add-item:hover{border-color:var(--accent);color:var(--accent)}
+.total-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 0 0;border-top:1px solid var(--border);margin-top:5px}
+.total-lbl{font-family:var(--mono);font-size:0.65rem;color:var(--text3)}
+.total-val{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--accent)}
+.toasts{position:fixed;bottom:18px;right:18px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.toast{display:flex;align-items:center;gap:8px;padding:9px 14px;color:white;border-radius:var(--radius);font-size:0.75rem;font-weight:500;box-shadow:var(--shadow-md);animation:tIn 0.2s ease;min-width:210px}
+.t-ok{background:var(--accent)}.t-err{background:#ef4444}.t-info{background:var(--accent2)}
+@keyframes tIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.login-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.login-screen::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(26,122,74,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(26,122,74,0.055) 1px,transparent 1px);background-size:48px 48px}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:360px;box-shadow:var(--shadow-md);position:relative;z-index:1}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.login-logo-icon{width:54px;height:54px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.login-logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.login-logo-text strong{display:block;font-family:var(--display);font-size:1rem;font-weight:700;color:var(--text)}
+.login-logo-text span{font-family:var(--mono);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em}
+.login-filial-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:0.65rem;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.08em;background:rgba(42,159,191,0.10);border:1px solid rgba(42,159,191,0.20);color:var(--accent2)}
+.login-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.login-sub{font-size:0.78rem;color:var(--text3);margin-bottom:24px}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.login-label{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3)}
+.login-input{padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);font-family:var(--sans);font-size:0.85rem;color:var(--text);outline:none;transition:border-color 0.14s}
+.login-input:focus{border-color:var(--accent);background:var(--surface)}
+.login-btn{width:100%;padding:11px;border-radius:var(--radius);border:none;background:var(--accent);color:white;font-family:var(--display);font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.14s;margin-top:6px}
+.login-btn:hover{background:#155e3a;transform:translateY(-1px)}
+.login-err{font-size:0.74rem;color:#ef4444;margin-top:10px;text-align:center;display:none}
+.login-err.show{display:block}
+.empty-col{text-align:center;padding:30px 10px;font-family:var(--mono);font-size:0.7rem;color:var(--text3)}
+.empty-page{text-align:center;padding:60px 20px;font-family:var(--mono);font-size:0.82rem;color:var(--text3)}
+@media(max-width:1100px){.kanban-board{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:860px){.stats-bar{grid-template-columns:repeat(3,1fr)}.dash-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}}
+</style>
 </head>
 <body>
-    <main class="section-shell contact">
-        <section class="contact-card">
-            <p class="eyebrow">Rota atualizada</p>
-            <h1>Este conteúdo agora faz parte do portfólio de desenvolvimento.</h1>
-            <p>Você será redirecionado para a seção de projetos. Se isso não acontecer, use o botão abaixo.</p>
-            <a class="btn primary" href="./#projetos">Ir para projetos</a>
-        </section>
-    </main>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><img src="logo.jpg" alt="GF Medical"></div>
+      <div class="login-logo-text"><strong>GF Medical</strong><span>Fichas OPME</span></div>
+    </div>
+    <div class="login-filial-badge">🔵 Filial Cuiabá · MT</div>
+    <div class="login-title">Entrar no sistema</div>
+    <div class="login-sub">Use as mesmas credenciais do Monitor Cirúrgico</div>
+    <div class="login-field"><label class="login-label">E-mail</label><input class="login-input" type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
+    <div class="login-field"><label class="login-label">Senha</label><input class="login-input" type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-err" id="l-err">E-mail ou senha incorretos.</div>
+  </div>
+</div>
+
+<div class="app" id="app-root" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon"><img src="logo.jpg" alt="GF Medical"></div>
+        <div class="logo-text"><strong>GF Medical</strong><span>Fichas OPME</span></div>
+      </div>
+    </div>
+    <div class="sidebar-inner">
+      <div class="slabel">Visualizações</div>
+      <a class="nav-item" id="nav-dashboard" href="#" onclick="goView('dashboard');return false"><span class="nav-icon">📊</span> Dashboard</a>
+      <a class="nav-item" id="nav-kanban" href="#" onclick="goView('kanban');return false"><span class="nav-icon">🗂️</span> Kanban</a>
+      <a class="nav-item active" id="nav-lista" href="#" onclick="goView('lista');return false"><span class="nav-icon">📄</span> Lista</a>
+      <a class="nav-item" id="nav-convenio" href="#" onclick="goView('convenio');return false"><span class="nav-icon">📑</span> Por Convênio</a>
+      <div class="sdiv"></div>
+      <div class="slabel">Por status</div>
+      <a class="nav-item" href="#" onclick="filtrarStatus(0);return false"><span class="nav-icon">⬜</span> Pendente<span class="nbadge nb0" id="nb0">0</span></a>
+      <a class="nav-item" href="#" onclick="filtrarStatus(1);return false"><span class="nav-icon">🔵</span> Pedido Criado<span class="nbadge nb1" id="nb1">0</span></a>
+      <a class="nav-item" href="#" onclick="filtrarStatus(2);return false"><span class="nav-icon">🟣</span> Em Laudação<span class="nbadge nb2" id="nb2">0</span></a>
+      <a class="nav-item" href="#" onclick="filtrarStatus(3);return false"><span class="nav-icon">🟡</span> Autorizado<span class="nbadge nb3" id="nb3">0</span></a>
+      <a class="nav-item" href="#" onclick="filtrarStatus(4);return false"><span class="nav-icon">🟠</span> Aguard. Faturamento<span class="nbadge nb4" id="nb4">0</span></a>
+      <a class="nav-item" href="#" onclick="filtrarStatus(5);return false"><span class="nav-icon">🟢</span> Faturado<span class="nbadge nb5" id="nb5">0</span></a>
+      <div class="sdiv"></div>
+      <a class="nav-item" href="index.html"><span class="nav-icon">⬅</span> Monitor Cirúrgico</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-av">?</div>
+        <div class="user-info"><strong id="user-nm">—</strong><span>Cuiabá · MT</span></div>
+        <span class="ftag">CBA</span>
+      </div>
+      <button onclick="doLogout()" style="width:100%;margin-top:6px;padding:6px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:0.72rem;cursor:pointer;font-family:var(--sans);transition:all 0.13s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">Sair da conta</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="page-title" id="page-title">Lista de Fichas</span>
+      <div class="sbox"><span style="color:var(--text3)">🔍</span><input type="text" id="busca" placeholder="Paciente, médico…" oninput="renderAtivo()"></div>
+      <button class="tbtn tbtn-g" onclick="exportarCSV()">⬇️ Exportar</button>
+      <button class="tbtn tbtn-p" onclick="abrirModal()">＋ Nova Ficha</button>
+    </div>
+    <div class="vtabs">
+      <div class="vtab" id="tab-dashboard" onclick="goView('dashboard')">📊 Dashboard</div>
+      <div class="vtab" id="tab-kanban" onclick="goView('kanban')">🗂️ Kanban</div>
+      <div class="vtab active" id="tab-lista" onclick="goView('lista')">📄 Lista</div>
+      <div class="vtab" id="tab-convenio" onclick="goView('convenio')">📑 Por Convênio</div>
+    </div>
+    <div class="page-content">
+      <div id="view-convenio" style="display:none"></div>
+      <div id="view-dashboard" style="display:none"></div>
+      <div id="view-kanban" style="display:none"></div>
+      <div id="view-lista">
+        <div class="fbar">
+          <span class="flabel">Status</span>
+          <div class="fchip on" onclick="setChip(this,-1)"><span class="fdot" style="background:var(--accent)"></span> Todos</div>
+          <div class="fchip" onclick="setChip(this,0)"><span class="fdot" style="background:var(--s0-c)"></span> Pendente</div>
+          <div class="fchip" onclick="setChip(this,1)"><span class="fdot" style="background:var(--s1-c)"></span> Pedido Criado</div>
+          <div class="fchip" onclick="setChip(this,2)"><span class="fdot" style="background:var(--s2-c)"></span> Em Laudação</div>
+          <div class="fchip" onclick="setChip(this,3)"><span class="fdot" style="background:var(--s3-c)"></span> Autorizado</div>
+          <div class="fchip" onclick="setChip(this,4)"><span class="fdot" style="background:var(--s4-c)"></span> Aguard. Faturamento</div>
+          <div class="fchip" onclick="setChip(this,5)"><span class="fdot" style="background:var(--s5-c)"></span> Faturado</div>
+        </div>
+        <div class="twrap">
+          <div class="thead-bar"><span class="thead-title">📋 Fichas OPME</span><span class="tcount" id="tcount">0 registros</span></div>
+          <table>
+            <thead><tr><th>Paciente</th><th>Médico</th><th>Procedimento</th><th>Cliente Fat.</th><th>Nº PV</th><th>Fluxo</th><th>Data Cirurgia</th><th>Total</th><th></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modal" class="modal-ov">
+  <div class="modal">
+    <div class="mhead"><span class="mtitle" id="modal-title">📋 Nova Ficha OPME</span><button class="mclose" onclick="fecharModal()">✕</button></div>
+    <div class="mbody">
+      <div class="uploads-grid">
+        <div class="uzone uzone-opme" id="zone-opme">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="selecionarArq(this,'opme')">
+          <div class="uzone-icon">📄</div>
+          <div class="uzone-label">Ficha OPME</div>
+          <div class="uzone-title">Anexar ficha</div>
+          <div class="uzone-sub">PDF, JPG, PNG · 20MB</div>
+          <div class="file-preview" id="fp-opme"><span class="fp-name" id="fp-opme-n"></span><span class="fp-size" id="fp-opme-s"></span><button class="fp-remove" onclick="removerArq(event,'opme')">✕</button></div>
+        </div>
+        <div class="uzone uzone-pv" id="zone-pv">
+          <input type="file" id="pv-input" accept=".pdf" onchange="selecionarPV(this)">
+          <div class="uzone-icon">🧾</div>
+          <div class="uzone-label">Pedido de Venda (C160)</div>
+          <div class="uzone-title">Importar PV · auto-preenche</div>
+          <div class="uzone-sub">PDF · extrai todos os campos</div>
+          <div class="file-preview" id="fp-pv"><span class="fp-name" id="fp-pv-n"></span><span class="fp-size" id="fp-pv-s"></span><button class="fp-remove" onclick="removerArq(event,'pv')">✕</button></div>
+          <div class="import-badge" id="import-badge">✅ Dados importados do C160</div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="flbl">Paciente *</label><input class="finput" id="f-pac" placeholder="Nome completo"></div>
+        <div class="fg"><label class="flbl">Médico *</label><input class="finput" id="f-med" placeholder="Dr./Dra." list="dl-medico"><datalist id="dl-medico"></datalist></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="flbl">Procedimento *</label><input class="finput" id="f-proc" placeholder="Ex: Stent Coronário"></div>
+        <div class="fg"><label class="flbl">Hospital</label><input class="finput" id="f-hosp" placeholder="Nome do hospital" list="dl-hospital"><datalist id="dl-hospital"></datalist></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="flbl">Cliente de Faturação</label><input class="finput" id="f-cliente" placeholder="Cliente para faturar" list="dl-cliente"><datalist id="dl-cliente"></datalist></div>
+        <div class="fg"><label class="flbl">Convênio</label><input class="finput" id="f-conv" placeholder="Ex: Unimed, SUS…" list="dl-convenio"><datalist id="dl-convenio"></datalist></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="flbl">Nº Pedido de Venda</label><input class="finput" id="f-pedido" placeholder="Ex: 4795"></div>
+        <div class="fg"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="flbl">Data da Cirurgia</label><input class="finput" type="date" id="f-data"></div>
+        <div class="fg"><label class="flbl">Status</label>
+          <select class="finput" id="f-status">
+            <option value="0">⬜ Pendente</option>
+            <option value="1">🔵 Pedido Criado</option>
+            <option value="2">🟣 Em Laudação</option>
+            <option value="3">🟡 Autorizado</option>
+            <option value="4">🟠 Aguardando Faturamento</option>
+            <option value="5">🟢 Faturado</option>
+          </select>
+        </div>
+      </div>
+      <div class="itens-section">
+        <div class="itens-hdr">
+          <span>🔩 Itens OPME</span>
+          <span style="font-weight:400;opacity:0.7;font-size:0.58rem">Descrição · Referência · Lote · Qtd · Preço Unit</span>
+        </div>
+        <div style="display:grid;grid-template-columns:3fr 1.2fr 1fr 0.8fr 0.9fr 28px;gap:6px;margin-bottom:3px;padding:0 2px">
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Descrição</span>
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Referência</span>
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Lote</span>
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Qtd</span>
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Preço Unit</span>
+          <span></span>
+        </div>
+        <div id="itens-container"></div>
+        <button class="add-item" onclick="adicionarItem()">＋ Adicionar item</button>
+        <div class="total-row"><span class="total-lbl">Total:</span><span class="total-val" id="total-val">R$ 0,00</span></div>
+      </div>
+      <div class="frow full"><div class="fg"><label class="flbl">Observações</label><textarea class="finput" id="f-obs" rows="2" placeholder="Notas adicionais…" style="resize:vertical"></textarea></div></div>
+    </div>
+    <div class="mfoot">
+      <button class="tbtn tbtn-g" onclick="fecharModal()">Cancelar</button>
+      <button class="tbtn tbtn-p" id="btn-salvar" onclick="salvarFicha()">💾 Salvar Ficha</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<div style="position:fixed;bottom:8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:0.58rem;color:var(--text3);opacity:0.6;z-index:50;white-space:nowrap;pointer-events:none">
+  Desenvolvido por <a href="https://devigorreis.github.io/portfolio" target="_blank" rel="noopener" style="color:var(--accent);opacity:1;text-decoration:none;pointer-events:all">Igor Reis</a>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCiPvYsGevYicQejvTsiC1j-64ziG2if58",
+  authDomain:"gfcuiaba-53b8d.firebaseapp.com",
+  projectId:"gfcuiaba-53b8d",
+  storageBucket:"gfcuiaba-53b8d.firebasestorage.app",
+  messagingSenderId:"105939167033",
+  appId:"1:105939167033:web:991387fc634e3d5f0d6ae8"
+};
+
+const COLL = 'fichas_opme';
+const FILIAL = 'CBA';
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const storage = getStorage(app);
+
+if (typeof pdfjsLib !== 'undefined')
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const STATUS = [
+  {label:'Pendente',               icon:'⬜', kh:'kh0', kb:'kb0', cnt:'cnt0', ff:'ff0'},
+  {label:'Pedido Criado',          icon:'🔵', kh:'kh1', kb:'kb1', cnt:'cnt1', ff:'ff1'},
+  {label:'Em Laudação',            icon:'🟣', kh:'kh2', kb:'kb2', cnt:'cnt2', ff:'ff2'},
+  {label:'Autorizado',             icon:'🟡', kh:'kh3', kb:'kb3', cnt:'cnt3', ff:'ff3'},
+  {label:'Aguardando Faturamento', icon:'🟠', kh:'kh4', kb:'kb4', cnt:'cnt4', ff:'ff4'},
+  {label:'Faturado',               icon:'🟢', kh:'kh5', kb:'kb5', cnt:'cnt5', ff:'ff5'},
+];
+
+let fichas=[], curView='lista', curFilter=-1, editingId=null, itens=[];
+let _medicos=[], _hospitais=[];
+let _arquivoOpme=null, _arquivoPv=null;
+
+onAuthStateChanged(auth, u => {
+  if (u) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-root').style.display = 'flex';
+    const nome = u.displayName || u.email || '';
+    document.getElementById('user-nm').textContent = nome.split(' ')[0] || nome;
+    document.getElementById('user-av').textContent = nome.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase() || '?';
+    carregarFichas();
+    carregarRegistros();
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-root').style.display = 'none';
+  }
+});
+
+window.doLogin = async () => {
+  const email = document.getElementById('l-email').value.trim();
+  const senha = document.getElementById('l-senha').value;
+  const er = document.getElementById('l-err');
+  er.classList.remove('show');
+  try { await signInWithEmailAndPassword(auth, email, senha); }
+  catch { er.classList.add('show'); }
+};
+
+window.doLogout = () => signOut(auth);
+
+let _unsubFichas = null;
+function carregarFichas() {
+  if (_unsubFichas) { _unsubFichas(); _unsubFichas = null; }
+  try {
+    const q = query(collection(db, COLL), orderBy('criadoEm','desc'));
+    _unsubFichas = onSnapshot(q, snap => {
+      fichas = snap.docs.map(d => ({_id:d.id, ...d.data()}));
+      atualizarBadges(); renderAtivo();
+    }, () => {
+      _unsubFichas = onSnapshot(collection(db, COLL), snap => {
+        fichas = snap.docs.map(d => ({_id:d.id, ...d.data()}));
+        atualizarBadges(); renderAtivo();
+      });
+    });
+  } catch(e) { console.error(e); }
+}
+
+async function uploadAnexo(file, tipo, fichaId) {
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+  const path = `opme/${fichaId}/${tipo}_${Date.now()}.${ext}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+}
+
+async function persistir(dados, id) {
+  if (!auth.currentUser) throw new Error('Faça login para salvar.');
+  const p = {...dados, filial: FILIAL, atualizadoEm: serverTimestamp()};
+  let docId = id;
+  if (!docId) {
+    p.criadoEm = serverTimestamp();
+    p.criadoPor = auth.currentUser.email || '';
+    const docRef = await addDoc(collection(db, COLL), p);
+    docId = docRef.id;
+  } else {
+    await setDoc(doc(db, COLL, docId), p, {merge: true});
+  }
+  const anexos = {};
+  if (_arquivoOpme) {
+    anexos.opmeAnexoUrl = await uploadAnexo(_arquivoOpme, 'ficha-opme', docId);
+    anexos.opmeAnexoNome = _arquivoOpme.name;
+  }
+  if (_arquivoPv) {
+    anexos.pvAnexoUrl = await uploadAnexo(_arquivoPv, 'pedido-venda', docId);
+    anexos.pvAnexoNome = _arquivoPv.name;
+  }
+  if (Object.keys(anexos).length) {
+    await setDoc(doc(db, COLL, docId), {...anexos, atualizadoEm: serverTimestamp()}, {merge: true});
+  }
+  _arquivoOpme = null;
+  _arquivoPv = null;
+  return docId;
+}
+
+window.excluirFicha = async id => {
+  if (!confirm('Excluir esta ficha?')) return;
+  await deleteDoc(doc(db, COLL, id));
+  toast('Ficha excluída', 'info');
+};
+
+window.mudStatus = async (id, s) => {
+  await setDoc(doc(db, COLL, id), {status:s, atualizadoEm:serverTimestamp()}, {merge:true});
+};
+
+window.goView = v => {
+  curView = v;
+  ['dashboard','kanban','lista','convenio'].forEach(id => {
+    document.getElementById('view-'+id).style.display = id===v ? '' : 'none';
+    document.getElementById('tab-'+id).classList.toggle('active', id===v);
+    const nav = document.getElementById('nav-'+id);
+    if (nav) nav.classList.toggle('active', id===v);
+  });
+  const T = {dashboard:'Dashboard · OPME', kanban:'Kanban · Fluxo OPME', lista:'Lista de Fichas', convenio:'Por Convênio'};
+  document.getElementById('page-title').textContent = T[v];
+  renderAtivo();
+};
+
+window.renderAtivo = () => {
+  if (curView==='lista') renderLista();
+  else if (curView==='kanban') renderKanban();
+  else if (curView==='convenio') renderPorConvenio();
+  else renderDashboard();
+};
+
+window.setChip = (el, s) => {
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on'); curFilter=s; renderLista();
+};
+
+window.filtrarStatus = s => {
+  curFilter=s; goView('lista');
+  document.querySelectorAll('.fchip').forEach((c,i) => c.classList.toggle('on', i===s+1));
+};
+
+function filtradas() {
+  const q = (document.getElementById('busca')?.value||'').toLowerCase();
+  return fichas.filter(f => {
+    if (curFilter>=0 && (f.status??0)!==curFilter) return false;
+    if (!q) return true;
+    return [(f.paciente||''),(f.medico||''),(f.procedimento||''),(f.hospital||''),(f.numeroPedido||''),(f.convenio||'')]
+      .some(s => s.toLowerCase().includes(q));
+  });
+}
+
+function atualizarBadges() {
+  STATUS.forEach((_,i) => {
+    const el = document.getElementById('nb'+i);
+    if (el) el.textContent = fichas.filter(f=>(f.status??0)===i).length;
+  });
+}
+
+function renderLista() {
+  const lista = filtradas();
+  document.getElementById('tcount').textContent = lista.length+' registro'+(lista.length!==1?'s':'');
+  const fD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+  const fV = v => v ? 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—';
+  document.getElementById('tbody').innerHTML = !lista.length
+    ? `<tr><td colspan="8" class="empty-page">Nenhuma ficha encontrada</td></tr>`
+    : lista.map(f => {
+        const s = f.status??0;
+        const btns = STATUS.map((st,si) =>
+          `<button class="iflow-btn${si===s?' cur cur'+si:''}" onclick="event.stopPropagation();mudStatus('${f._id}',${si})" title="${st.label}">${si===s?'●':(si+1)}</button>${si<5?'<span class="iflow-arr">›</span>':''}`
+        ).join('');
+        return `<tr onclick="abrirModal('${f._id}')">
+          <td class="td-pac">${esc(f.paciente||'—')}</td>
+          <td class="td-trunc">${esc(f.medico||'—')}</td>
+          <td class="td-trunc">${esc(f.procedimento||'—')}</td>
+          <td class="td-trunc">${esc(f.cliente||'—')}</td>
+          <td class="td-mono">${esc(f.numeroPedido||'—')}</td>
+          <td onclick="event.stopPropagation()"><div class="iflow">${btns}</div></td>
+          <td class="td-mono">${fD(f.dataCirurgia)}</td>
+          <td class="td-mono">${fV(f.total)}</td>
+          <td onclick="event.stopPropagation()"><div class="row-acts">
+            <button class="abtn" onclick="abrirModal('${f._id}')" title="Editar">✏️</button>
+            <button class="abtn del" onclick="excluirFicha('${f._id}')" title="Excluir">🗑</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+}
+
+function renderKanban() {
+  const fD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '';
+  document.getElementById('view-kanban').innerHTML = `<div class="kanban-board">${
+    STATUS.map((st,si) => {
+      const cards = fichas.filter(f => (f.status??0)===si);
+      return `<div class="kcol">
+        <div class="kcol-head ${st.kh}">${st.icon} ${st.label}<span class="kcnt ${st.cnt}">${cards.length}</span></div>
+        <div class="kcol-body ${st.kb}">${!cards.length ? '<div class="empty-col">Sem fichas</div>' :
+          cards.map(f => `<div class="kcard" onclick="abrirModal('${f._id}')">
+            <div class="kcard-pac">${esc(f.paciente||'—')}</div>
+            <div class="kcard-proc">${esc(f.procedimento||'—')}${f.medico?' · '+esc(f.medico):''}</div>
+            <div class="kcard-bot">
+              <span class="kcard-conv">${esc(f.convenio||f.hospital||'—')}</span>
+              <span class="kcard-data">${fD(f.dataCirurgia)}</span>
+            </div>
+            <div class="kcard-actions" onclick="event.stopPropagation()">
+              ${si<5?`<button class="kbtn" style="border-color:var(--s${si+1}-bd);color:var(--s${si+1}-c)" onclick="mudStatus('${f._id}',${si+1})">→ ${STATUS[si+1].label}</button>`:''}
+              ${si>0?`<button class="kbtn" style="border-color:var(--border);color:var(--text3);flex:0;padding:4px 8px" onclick="mudStatus('${f._id}',${si-1})">↩</button>`:''}
+              <button class="kbtn" style="border-color:var(--border);color:var(--text3);flex:0;padding:4px 8px" onclick="abrirModal('${f._id}')">✏️</button>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
+// POR CONVÊNIO — visão tipo planilha, agrupada por convênio com subtotais
+function renderPorConvenio() {
+  const lista = filtradas();
+  const fD = d => d ? new Date(d+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+  const fV = v => 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+  if (!lista.length) {
+    document.getElementById('view-convenio').innerHTML = `<div class="twrap"><div class="empty-page">Nenhuma ficha encontrada</div></div>`;
+    return;
+  }
+
+  const grupos = {};
+  lista.forEach(f => { const c = f.convenio?.trim() || 'Sem convênio'; (grupos[c] = grupos[c]||[]).push(f); });
+  const nomes = Object.keys(grupos).sort((a,b) => a==='Sem convênio'?1 : b==='Sem convênio'?-1 : a.localeCompare(b,'pt-BR'));
+
+  const grandTotal = lista.reduce((s,f) => s+(Number(f.total)||0), 0);
+
+  document.getElementById('view-convenio').innerHTML = `
+    <div class="twrap" style="margin-bottom:14px">
+      <div class="thead-bar">
+        <span class="thead-title">📑 Resumo por Convênio</span>
+        <span class="tcount">${nomes.length} convênio${nomes.length!==1?'s':''} · ${lista.length} ficha${lista.length!==1?'s':''}</span>
+      </div>
+      <table>
+        <thead><tr><th>Convênio</th><th>Fichas</th><th>Valor Total</th><th>% do Total</th></tr></thead>
+        <tbody>
+          ${nomes.map(c => {
+            const g = grupos[c], sub = g.reduce((s,f)=>s+(Number(f.total)||0),0);
+            return `<tr style="cursor:pointer" onclick="document.getElementById('cg-${esc(c).replace(/[^a-zA-Z0-9]/g,'_')}').scrollIntoView({behavior:'smooth',block:'start'})">
+              <td class="td-pac">${esc(c)}</td>
+              <td class="td-mono">${g.length}</td>
+              <td class="td-mono">${fV(sub)}</td>
+              <td class="td-mono">${grandTotal?Math.round(sub/grandTotal*100):0}%</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot><tr style="background:var(--surface2);font-weight:700">
+          <td class="td-pac">TOTAL GERAL</td><td class="td-mono">${lista.length}</td><td class="td-mono">${fV(grandTotal)}</td><td class="td-mono">100%</td>
+        </tr></tfoot>
+      </table>
+    </div>
+    ${nomes.map(c => {
+      const g = grupos[c], sub = g.reduce((s,f)=>s+(Number(f.total)||0),0);
+      const slug = esc(c).replace(/[^a-zA-Z0-9]/g,'_');
+      return `<div class="twrap" id="cg-${slug}" style="margin-bottom:14px">
+        <div class="thead-bar">
+          <span class="thead-title">🏥 ${esc(c)}</span>
+          <span class="tcount">${g.length} ficha${g.length!==1?'s':''} · ${fV(sub)}</span>
+        </div>
+        <table>
+          <thead><tr><th>Paciente</th><th>Médico</th><th>Procedimento</th><th>Hospital</th><th>Cliente Fat.</th><th>Nº PV</th><th>Status</th><th>Data Cirurgia</th><th>Valor</th></tr></thead>
+          <tbody>
+            ${g.map(f => {
+              const s = f.status ?? 0;
+              return `<tr onclick="abrirModal('${f._id}')" style="cursor:pointer">
+                <td class="td-pac">${esc(f.paciente||'—')}</td>
+                <td class="td-trunc">${esc(f.medico||'—')}</td>
+                <td class="td-trunc">${esc(f.procedimento||'—')}</td>
+                <td class="td-trunc">${esc(f.hospital||'—')}</td>
+                <td class="td-trunc">${esc(f.cliente||'—')}</td>
+                <td class="td-mono">${esc(f.numeroPedido||'—')}</td>
+                <td><span class="badge" style="color:var(--s${s}-c);background:var(--s${s}-bg);border-color:var(--s${s}-bd)">${STATUS[s].icon} ${STATUS[s].label}</span></td>
+                <td class="td-mono">${fD(f.dataCirurgia)}</td>
+                <td class="td-mono">${fV(f.total)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot><tr style="background:var(--surface2);font-weight:700">
+            <td class="td-pac" colspan="7">Subtotal · ${esc(c)}</td><td class="td-mono">${fV(sub)}</td>
+          </tr></tfoot>
+        </table>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function renderDashboard() {
+  const totais = STATUS.map((_,i) => fichas.filter(f=>(f.status??0)===i).length);
+  const total = fichas.length;
+  const fV = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  const valorTotal = fichas.reduce((a,f) => a+(Number(f.total)||0), 0);
+  const mx = Math.max(...totais, 1);
+  const agora = Date.now();
+
+  function tempoRelativo(seg) {
+    if (!seg) return 'agora';
+    const d = Math.round((agora/1000-seg)/60);
+    if (d<2) return 'agora';
+    if (d<60) return `há ${d}min`;
+    if (d<1440) return `há ${Math.round(d/60)}h`;
+    return `há ${Math.round(d/1440)}d`;
+  }
+
+  const recentes = [...fichas].filter(f=>f.atualizadoEm?.seconds)
+    .sort((a,b)=>(b.atualizadoEm?.seconds||0)-(a.atualizadoEm?.seconds||0)).slice(0,5);
+
+  const convMap={}; fichas.forEach(f=>{const c=f.convenio||'—';convMap[c]=(convMap[c]||0)+1;});
+  const convList=Object.entries(convMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mxC=convList[0]?.[1]||1;
+
+  const medMap={}; fichas.forEach(f=>{const m=f.medico||'—';medMap[m]=(medMap[m]||0)+1;});
+  const medList=Object.entries(medMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const mxM=medList[0]?.[1]||1;
+
+  document.getElementById('view-dashboard').innerHTML = `
+    <div class="stats-bar">
+      ${STATUS.map((st,i)=>`<div class="stat-card sc${i}" onclick="filtrarStatus(${i})">
+        <div class="stat-lbl">${st.label}</div>
+        <div class="stat-val">${totais[i]}</div>
+        <div class="stat-sub">${total?Math.round(totais[i]/total*100):0}% do total</div>
+      </div>`).join('')}
+    </div>
+    <div class="dash-grid">
+      <div class="dcard">
+        <div class="dcard-head">📊 Funil do Fluxo</div>
+        <div class="dcard-body">
+          <div class="funnel">
+            ${STATUS.map((st,i)=>`<div class="funnel-row">
+              <span class="funnel-name" style="color:var(--s${i}-c)">${st.label}</span>
+              <div class="funnel-track"><div class="funnel-fill ${st.ff}" style="width:${total?Math.round(totais[i]/mx*100):0}%">${totais[i]>0?`<span>${totais[i]}</span>`:''}</div></div>
+              <span class="funnel-count">${totais[i]}</span>
+            </div>`).join('')}
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-family:var(--mono);font-size:0.6rem;color:var(--text3)">
+            Total: <strong style="color:var(--text)">${total} fichas</strong>&nbsp;·&nbsp;Valor: <strong style="color:var(--accent)">${fV(valorTotal)}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-head">🕐 Atividade Recente</div>
+        <div class="dcard-body" style="padding:0 14px">
+          <div class="act-list">
+            ${!recentes.length
+              ? '<div class="empty-col" style="padding:20px 0">Nenhuma atividade registrada</div>'
+              : recentes.map(f=>{const s=f.status??0;return `<div class="act-item">
+                  <div class="act-dot" style="background:var(--s${s}-c)"></div>
+                  <div class="act-info">
+                    <div class="act-name">${esc(f.paciente||'—')}</div>
+                    <div class="act-desc">${STATUS[s].label} · ${esc(f.procedimento||f.convenio||'—')}</div>
+                  </div>
+                  <span class="act-time">${tempoRelativo(f.atualizadoEm?.seconds)}</span>
+                </div>`;}).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-head">🏥 Por Convênio</div>
+        <div class="dcard-body">
+          ${!convList.length?'<div class="empty-col">Sem dados</div>':
+            `<div class="funnel">${convList.map(([c,n])=>`<div class="funnel-row">
+              <span class="funnel-name" style="font-size:0.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(c)}">${esc(c)}</span>
+              <div class="funnel-track" style="height:16px"><div style="width:${Math.round(n/mxC*100)}%;height:100%;background:var(--accent2);border-radius:4px"></div></div>
+              <span class="funnel-count">${n}</span>
+            </div>`).join('')}</div>`}
+        </div>
+      </div>
+      <div class="dcard">
+        <div class="dcard-head">👨‍⚕️ Por Médico</div>
+        <div class="dcard-body">
+          ${!medList.length?'<div class="empty-col">Sem dados</div>':
+            `<div class="funnel">${medList.map(([m,n])=>`<div class="funnel-row">
+              <span class="funnel-name" style="font-size:0.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(m)}">${esc(m)}</span>
+              <div class="funnel-track" style="height:16px"><div style="width:${Math.round(n/mxM*100)}%;height:100%;background:var(--accent3);border-radius:4px"></div></div>
+              <span class="funnel-count">${n}</span>
+            </div>`).join('')}</div>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+window.abrirModal = id => {
+  editingId=id||null; itens=[];
+  _arquivoOpme=null; _arquivoPv=null;
+  ['opme','pv'].forEach(t=>{
+    document.getElementById('fp-'+t).classList.remove('show');
+    document.getElementById('zone-'+t).classList.remove('has-file');
+  });
+  document.getElementById('import-badge').classList.remove('show');
+  document.getElementById('pv-input').value='';
+  if (id) {
+    const f=fichas.find(x=>x._id===id); if(!f) return;
+    document.getElementById('modal-title').textContent='✏️ Editar Ficha OPME';
+    document.getElementById('f-pac').value    = f.paciente||'';
+    document.getElementById('f-med').value    = f.medico||'';
+    document.getElementById('f-proc').value   = f.procedimento||'';
+    document.getElementById('f-hosp').value   = f.hospital||'';
+    document.getElementById('f-cliente').value = f.cliente||'';
+    document.getElementById('f-conv').value   = f.convenio||'';
+    document.getElementById('f-pedido').value = f.numeroPedido||'';
+    document.getElementById('f-data').value   = f.dataCirurgia||'';
+    document.getElementById('f-status').value = f.status??0;
+    document.getElementById('f-obs').value    = f.observacoes||'';
+    itens=(f.itens||[]).map(i=>({...i}));
+    if (f.opmeAnexoUrl || f.opmeAnexoNome) {
+      document.getElementById('fp-opme-n').textContent = f.opmeAnexoNome || 'Ficha OPME';
+      document.getElementById('fp-opme-s').textContent = f.opmeAnexoUrl ? 'Salvo no banco' : '';
+      document.getElementById('fp-opme').classList.add('show');
+      document.getElementById('zone-opme').classList.add('has-file');
+    }
+    if (f.pvAnexoUrl || f.pvAnexoNome) {
+      document.getElementById('fp-pv-n').textContent = f.pvAnexoNome || 'Pedido de Venda';
+      document.getElementById('fp-pv-s').textContent = f.pvAnexoUrl ? 'Salvo no banco' : '';
+      document.getElementById('fp-pv').classList.add('show');
+      document.getElementById('zone-pv').classList.add('has-file');
+    }
+  } else {
+    document.getElementById('modal-title').textContent='📋 Nova Ficha OPME';
+    const up=new URLSearchParams(window.location.search);
+    document.getElementById('f-pac').value    = up.get('paciente')    ||'';
+    document.getElementById('f-med').value    = up.get('medico')      ||'';
+    document.getElementById('f-proc').value   = up.get('procedimento')||'';
+    document.getElementById('f-hosp').value   = up.get('hospital')    ||'';
+    document.getElementById('f-conv').value   = up.get('convenio')    ||'';
+    document.getElementById('f-pedido').value = '';
+    document.getElementById('f-data').value   = up.get('data')        ||'';
+    document.getElementById('f-obs').value    = '';
+    document.getElementById('f-status').value=0;
+    itens=[{descricao:'',referencia:'',lote:'',qtd:1,precoUnit:0}];
+  }
+  renderItens();
+  document.getElementById('modal').classList.add('open');
+};
+
+window.fecharModal = () => { document.getElementById('modal').classList.remove('open'); editingId=null; };
+
+window.salvarFicha = async () => {
+  const pac=document.getElementById('f-pac').value.trim();
+  const med=document.getElementById('f-med').value.trim();
+  const proc=document.getElementById('f-proc').value.trim();
+  if(!pac){alert('Informe o paciente.');return;}
+  if(!med){alert('Informe o médico.');return;}
+  coletarItens();
+  const iv=itens.filter(i=>i.descricao.trim());
+  const total=iv.reduce((s,i)=>s+(Number(i.precoUnit)||0)*(Number(i.qtd)||0),0);
+  const dados={paciente:pac,medico:med,procedimento:proc,
+    hospital:document.getElementById('f-hosp').value.trim(),
+    cliente:document.getElementById('f-cliente').value.trim()||document.getElementById('f-hosp').value.trim(),
+    convenio:document.getElementById('f-conv').value.trim(),
+    numeroPedido:document.getElementById('f-pedido').value.trim(),
+    dataCirurgia:document.getElementById('f-data').value,
+    status:parseInt(document.getElementById('f-status').value),
+    observacoes:document.getElementById('f-obs').value.trim(),
+    itens:iv,total};
+  const btn=document.getElementById('btn-salvar');
+  btn.disabled=true; btn.textContent='Salvando…';
+  try {
+    if (_arquivoOpme || _arquivoPv) btn.textContent='Enviando anexos…';
+    await persistir(dados,editingId);
+    fecharModal();
+    toast(editingId?'Ficha atualizada no banco!':'Ficha salva no banco!','ok');
+  }
+  catch(e){
+    const msg = e.code === 'permission-denied'
+      ? 'Sem permissão no Firebase. Verifique se está logado e se as regras do Firestore permitem a coleção fichas_opme.'
+      : e.message;
+    alert('Erro ao salvar: '+msg);
+  }
+  finally{ btn.disabled=false; btn.textContent='💾 Salvar Ficha'; }
+};
+
+function renderItens() {
+  document.getElementById('itens-container').innerHTML=itens.map((it,i)=>`
+    <div class="item-row">
+      <input class="finput" placeholder="Descrição…" value="${esc(it.descricao||'')}" oninput="itens[${i}].descricao=this.value;calcTotal()">
+      <input class="finput" placeholder="Ref/Cód" value="${esc(it.referencia||'')}" oninput="itens[${i}].referencia=this.value">
+      <input class="finput" placeholder="Lote" value="${esc(it.lote||'')}" oninput="itens[${i}].lote=this.value">
+      <input class="finput" type="number" min="0" step="1" value="${it.qtd||1}" oninput="itens[${i}].qtd=+this.value;calcTotal()">
+      <input class="finput" type="number" min="0" step="0.01" value="${it.precoUnit||0}" oninput="itens[${i}].precoUnit=+this.value;calcTotal()">
+      <button class="item-rm" onclick="removerItem(${i})">✕</button>
+    </div>`).join('');
+  calcTotal();
+}
+
+window.adicionarItem=()=>{coletarItens();itens.push({descricao:'',referencia:'',lote:'',qtd:1,precoUnit:0});renderItens();};
+window.removerItem=i=>{coletarItens();itens.splice(i,1);renderItens();};
+
+function coletarItens(){
+  document.querySelectorAll('#itens-container .item-row').forEach((row,i)=>{
+    if(!itens[i])return;
+    const inp=row.querySelectorAll('input');
+    itens[i].descricao=inp[0].value;itens[i].referencia=inp[1].value;itens[i].lote=inp[2].value;
+    itens[i].qtd=Number(inp[3].value)||1;itens[i].precoUnit=Number(inp[4].value)||0;
+  });
+}
+
+function calcTotal(){
+  const t=itens.reduce((s,i)=>s+(Number(i.precoUnit)||0)*(Number(i.qtd)||1),0);
+  document.getElementById('total-val').textContent='R$ '+t.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+const fmt=b=>b<1024*1024?(b/1024).toFixed(0)+' KB':(b/1024/1024).toFixed(1)+' MB';
+
+window.selecionarArq=(input,tipo)=>{
+  const f=input.files[0];if(!f)return;
+  if(tipo==='opme') _arquivoOpme=f;
+  if(tipo==='pv') _arquivoPv=f;
+  document.getElementById('fp-'+tipo+'-n').textContent=f.name;
+  document.getElementById('fp-'+tipo+'-s').textContent=fmt(f.size);
+  document.getElementById('fp-'+tipo).classList.add('show');
+  document.getElementById('zone-'+tipo).classList.add('has-file');
+};
+
+window.removerArq=(e,tipo)=>{
+  e.preventDefault();e.stopPropagation();
+  if(tipo==='opme') _arquivoOpme=null;
+  if(tipo==='pv') _arquivoPv=null;
+  document.getElementById('fp-'+tipo).classList.remove('show');
+  document.getElementById('zone-'+tipo).classList.remove('has-file');
+  if(tipo==='pv'){document.getElementById('pv-input').value='';document.getElementById('import-badge').classList.remove('show');}
+};
+
+window.selecionarPV=async input=>{
+  const file=input.files[0];if(!file)return;
+  _arquivoPv=file;
+  document.getElementById('fp-pv-n').textContent=file.name;
+  document.getElementById('fp-pv-s').textContent=fmt(file.size);
+  document.getElementById('fp-pv').classList.add('show');
+  document.getElementById('zone-pv').classList.add('has-file');
+  if(typeof pdfjsLib==='undefined'){toast('PDF.js não disponível.','err');return;}
+  toast('Lendo PDF…','info');
+  try{
+    const dados=await extrairC160(file,file.name);
+    preencherDeC160(dados);
+    document.getElementById('import-badge').classList.add('show');
+    const temPdf=!!(dados.medico||dados.hospital||dados.convenio);
+    toast(temPdf?'✅ Dados importados do C160!':'⚠️ Dados básicos extraídos do nome do arquivo.',temPdf?'ok':'info');
+  }catch(e){console.error(e);toast('Não foi possível extrair os dados.','err');}
+};
+
+async function extrairC160(file,filename){
+  const base=parsearC160('',filename);
+  try{
+    const ab=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+    const allItems=[];
+    for(let p=1;p<=pdf.numPages;p++){
+      const page=await pdf.getPage(p);
+      const content=await page.getTextContent();
+      content.items.forEach(it=>{
+        if(!it.str)return;
+        allItems.push({str:it.str,x:it.transform[4],y:it.transform[5],
+          w:it.width||(it.str.length*Math.abs(it.transform[0])*0.5),pg:p});
+      });
+    }
+    allItems.sort((a,b)=>a.pg-b.pg||b.y-a.y||a.x-b.x);
+    const lines=[];
+    for(const item of allItems){
+      const last=lines[lines.length-1];
+      if(last&&last[0].pg===item.pg&&Math.abs(item.y-last[0].y)<=4){last.push(item);}
+      else lines.push([item]);
+    }
+    const texto=lines.map(grp=>{
+      let r='';
+      for(let i=0;i<grp.length;i++){
+        if(i===0){r=grp[i].str;continue;}
+        const prev=grp[i-1];const gap=grp[i].x-(prev.x+prev.w);
+        r+=(gap>2?' ':'')+grp[i].str;
+      }
+      return r;
+    }).join('\n');
+    console.log('[C160] texto bruto extraído pelo PDF.js:\n' + texto);
+    const fromPdf=parsearC160(texto,filename);
+    console.log('[C160] dados extraídos:', fromPdf);
+    return Object.assign(base,fromPdf);
+  }catch(e){
+    console.warn('PDF.js falhou, usando dados do filename:',e);
+    return base;
+  }
+}
+
+function parsearC160(texto,filename){
+  const r={itens:[]};
+  const lmp=s=>s.replace(/\s+/g,' ').trim();
+  const pv=v=>parseFloat((v||'').replace(/\./g,'').replace(',','.')) || 0;
+  // 1. Filename → nº pedido + paciente
+  if(filename){const mFN=filename.match(/N[ºo°]\s*(\d+)\s*[-–—]\s*(.+?)(?:\.\w{2,4})?$/i);if(mFN){r.numeroPedido=mFN[1].trim();r.paciente=lmp(mFN[2]);}}
+  if(!texto)return r;
+  // PDF.js às vezes extrai o texto fora da ordem visual; reconstrói o texto
+  // a partir de linhas já aparadas para os regex com ^/$ funcionarem bem.
+  const ls=texto.split(/\r?\n/).map(l=>l.trim());
+  const txt=ls.join('\n');
+  // 2. Cliente do pedido → vira o campo Hospital da ficha (conforme solicitado)
+  //    Ex.: "284 UNIMED CAMPO GRANDE MS - CONVENIO Dt. Digitação: 12/06/2026"
+  const mCliente=txt.match(/\d{1,6}\s+(.+?)\s+Dt\.\s*Digita[çc][aã]o\s*:/i);
+  if(mCliente)r.hospital=lmp(mCliente[1]);
+  // 3. Paciente inline
+  const mPac=txt.match(/Paciente\s*[:\-·]\s*([^\n\r]+)/i);
+  if(mPac)r.paciente=lmp(mPac[1]);
+  // 4. Fallbacks genéricos: inline ("Label: Valor" na mesma linha) e
+  //    duas-linhas (label sozinho → valor na linha seguinte). Roda ANTES da
+  //    heurística abaixo porque é mais confiável quando o C160 tem os
+  //    campos limpos (ex.: "Médico: NOME" na própria linha).
+  const HOSP=/(?:Hospital|Cl[ií]nica|Cliente(?:\s*\/\s*Hospital)?|Nome\s+do\s+Cliente|Raz[aã]o\s+Social|Empresa|Estabelecimento)/i;
+  const hdI=[
+    [/(?:M[eé]dico|Cirurgi[aã]o)(?:\s+(?:Solicitante|Respons[aá]vel))?\s*[:\-·]\s*([^\n\r]+)/i,'medico'],
+    [new RegExp(HOSP.source+String.raw`\s*(?:\/[^:\n]*)?\s*[:\-·]\s*([^\n\r]+)`,'i'),'hospital'],
+    [/(?:Conv[eê]nio|Plano(?:\s+de\s+Sa[uú]de)?|Operadora|Conv\.?)\s*[:\-·]\s*([^\n\r]+)/i,'convenio'],
+  ];
+  for(const[re,k]of hdI){if(r[k])continue;const m=txt.match(re);if(m?.[1]){const v=lmp(m[1]);if(v.length>1)r[k]=v;}}
+  const HOSP_LBL=new RegExp('^'+HOSP.source+String.raw`\s*:?$`,'i');
+  for(let i=0;i<ls.length-1;i++){
+    const l=ls[i],nx=lmp(ls[i+1]);
+    if(!nx||nx.length<2)continue;
+    if(!r.medico&&/^(?:M[eé]dico|Cirurgi[aã]o)(?:\s+\w+)?\s*:?$/i.test(l))r.medico=nx;
+    if(!r.hospital&&HOSP_LBL.test(l))r.hospital=nx;
+    if(!r.convenio&&/^(?:Conv[eê]nio|Plano(?:\s+de\s+Sa[uú]de)?|Operadora)\s*:?$/i.test(l))r.convenio=nx;
+  }
+  // 5. Último recurso: em alguns C160 os VALORES de Médico/Convênio/Hospital
+  //    aparecem em até 3 linhas soltas logo ANTES de "Paciente:", com os
+  //    rótulos vazios só depois. Só usa se os métodos acima não acharam
+  //    nada, e ignora qualquer linha com ":" em qualquer posição (sinal de
+  //    ser uma linha de rótulos embaralhados, não um valor real).
+  if(!r.medico||!r.convenio||!r.hospital){
+    const idxPac=ls.findIndex(l=>/^Paciente\s*:/i.test(l));
+    if(idxPac>0){
+      const vals=[];
+      for(let k=idxPac-1;k>=0&&vals.length<3;k--){
+        const lk=ls[k];
+        if(!lk)continue;
+        if(/:/.test(lk))break;
+        if(/^(?:Locais de Estoque|Item\b|Registro ANVISA|PC)$/i.test(lk))break;
+        vals.unshift(lk);
+      }
+      if(vals.length>=1&&!r.hospital)r.hospital=vals[vals.length-1];
+      if(vals.length>=2&&!r.convenio)r.convenio=vals[vals.length-2];
+      if(vals.length>=3&&!r.medico)r.medico=vals[vals.length-3];
+    }
+  }
+  // 6. Nº pedido fallback
+  if(!r.numeroPedido){const m=txt.match(/Pedido\s*(?:de\s*Venda)?\s*N[ºo°]?\.?\s*[:\-]?\s*(\d+)/i)||txt.match(/N[ºo°]\s*(\d{4,6})\b/);if(m)r.numeroPedido=m[1].trim();}
+  // 7. Data da cirurgia
+  const mDt=txt.match(/(?:Data\s*(?:(?:da\s+)?Cirurgia|Cir\.?|Procedimento|do\s+Ato)?\s*[:\-]?\s*)(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{2,4})/i)||txt.match(/(\d{2}\/\d{2}\/\d{4})/);
+  if(mDt){const pts=mDt[1].replace(/[-\.]/g,'/').split('/');if(pts.length===3){const[d,m,y]=pts;r.dataCirurgia=`${y.length===2?'20'+y:y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;}}
+  // 8. Limpar cabeçalho
+  ['paciente','medico','hospital','convenio'].forEach(k=>{if(r[k])r[k]=lmp(r[k]);});
+  // 9. ITENS — recombina 4 blocos paralelos que o PDF.js extrai fora de
+  //    ordem, mas cada um preserva a ordem relativa dos itens (1º, 2º, 3º…):
+  //    A) "CÓDIGO DESCRIÇÃO REGISTROANVISA - FABRICANTE"
+  //    B) quantidades, logo após o rótulo solto "Unidade:"
+  //    C) "SEQ PREÇOUNIT VALORTOTAL DD/MM/AAAA"
+  //    D) lotes — "N. Lote: XXX" ou linha solta "XXX QTD DD/MM/AAAA"
+  const bases=[];
+  {
+    // Código de produto começa com dígitos (ex.: 2347C, 2235) — evita casar
+    // linhas de endereço/telefone que também têm um número de 6+ dígitos
+    // seguido de hífen (CEP, CNPJ).
+    const re=/^(\d{2,8}[A-Z0-9]{0,4})\s+(.+?)\s+(\d{6,})\s*-\s*(.+)$/gm;
+    let m;
+    while((m=re.exec(txt))){
+      if(/CEP|CNPJ|Fax\b|Tel\.|Insc\.|Bairro|Endere[çc]|Brasil|LOJA\b/i.test(m[0]))continue;
+      const desc=lmp(m[2]);if(desc.length>=3)bases.push({referencia:m[1],descricao:desc});
+    }
+  }
+  // C) Preço unitário + quantidade — em muitos C160 reais essas colunas vêm
+  //    coladas dentro da MESMA linha do item, sem espaço entre a data e a
+  //    quantidade (ex.: "...170,00 170,00 12/06/20261,00 0,00..."). Captura
+  //    os dois valores decimais logo antes da data + o valor colado depois.
+  const lineVals=[];
+  {
+    const re=/([\d.]+,\d{2})\s+[\d.]+,\d{2}\s+\d{2}\/\d{2}\/\d{4}(\d+,\d{2})/g;
+    let m;
+    while((m=re.exec(txt)))lineVals.push({precoUnit:pv(m[1]),qtd:pv(m[2])});
+  }
+  // Fallback antigo: quantidades soltas após o rótulo "Unidade:"
+  const qtys=[];
+  if(lineVals.length<bases.length){
+    const idxUn=ls.findIndex(l=>/^Unidade\s*:?\s*(?:PC)?\s*$/i.test(l));
+    if(idxUn>=0){for(let k=idxUn+1;k<ls.length;k++){if(/^[\d.,]+$/.test(ls[k]))qtys.push(pv(ls[k]));else break;}}
+  }
+  // Fallback antigo: "SEQ PREÇOUNIT VALORTOTAL DATA" em linha própria
+  const prices=[];
+  if(lineVals.length<bases.length){
+    const re=/^(\d{1,3})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+\d{2}\/\d{2}\/\d{4}\s*$/gm;
+    let m;
+    while((m=re.exec(txt)))prices.push({precoUnit:pv(m[2])});
+  }
+  // D) Lotes — "Dt. Validade:" (rótulos embaralhados, valor logo após),
+  //    "N. Lote: XXX" (formato limpo) ou linha solta "XXX QTD DD/MM/AAAA"
+  const lotes=[];
+  {
+    const re=/Dt\.\s*Validade\s*:\s*([A-Z0-9]{4,})\s+[\d.,]+\s+\d{2}\/\d{2}\/\d{4}|N\.\s*Lote\s*:\s*([A-Z0-9]{4,})|^([A-Z0-9]{5,})\s+[\d.,]+\s+\d{2}\/\d{2}\/\d{4}/gim;
+    let m;const raw=[];
+    while((m=re.exec(txt)))raw.push(m[1]||m[2]||m[3]);
+    for(const lv of raw)if(lotes[lotes.length-1]!==lv)lotes.push(lv);
+  }
+  bases.forEach((b,i)=>{
+    const lv=lineVals[i];
+    r.itens.push({descricao:b.descricao,referencia:b.referencia,lote:lotes[i]||'',qtd:lv?lv.qtd:(qtys[i]!=null?qtys[i]:1),precoUnit:lv?lv.precoUnit:(prices[i]?.precoUnit||0)});
+  });
+  // 10. Fallback — formato antigo "SEQ COD DESC QTY PREÇO TOTAL" em linha única
+  if(!r.itens.length){
+    let iStart=0;
+    for(let i=0;i<ls.length;i++){const l=ls[i].toLowerCase();if(['descri','qtd','pre'].filter(k=>l.includes(k)).length>=2&&l.includes('descri')){iStart=i+1;break;}}
+    for(let i=iStart;i<ls.length;i++){
+      const l=ls[i];
+      if(!l)continue;
+      if(/^(?:total\s+geral|total\s+do\s+pedido|sub\s*total|observa[çc]|assina[çc]|declaro)/i.test(l))break;
+      const mSeq=l.match(/^(\d{1,3})\s+(.*)/);
+      if(!mSeq)continue;
+      const resto=mSeq[2].trim();
+      if(/^(?:c[oó]d|descri|item\b|lote\b|qtd|pre[çc]|valor|ref)/i.test(resto))continue;
+      const it={descricao:'',referencia:'',lote:'',qtd:1,precoUnit:0};
+      const mA=resto.match(/^(\S+)\s+(.+?)\s+(\d+(?:[.,]\d+)?)\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s*$/);
+      if(mA){it.referencia=mA[1];it.descricao=lmp(mA[2]);it.qtd=pv(mA[3]);it.precoUnit=pv(mA[4]);}
+      else{const mB=resto.match(/^(\S+)\s+(.+)/);if(mB){it.referencia=mB[1];it.descricao=lmp(mB[2]);}else{it.descricao=lmp(resto);}}
+      for(let j=i+1;j<Math.min(i+9,ls.length);j++){
+        const lj=ls[j];
+        if(!lj)continue;
+        if(/^\d{1,3}\s+\S/.test(lj)&&j>i+1)break;
+        if(/^(?:total|subtotal|observa|assina)/i.test(lj))break;
+        if(!it.lote){const mL=lj.match(/(?:N[°º]?\s*)?Lote\s*[:\s]+([A-Z0-9][\w\-]{0,20})/i);if(mL)it.lote=mL[1];}
+        if(!it.precoUnit){const mPU=lj.match(/Pre[çc]o\s*(?:Unit[^\d]*)?([\d.]+,\d{2})/i);if(mPU)it.precoUnit=pv(mPU[1]);}
+        if(it.qtd===1){const mQ=lj.match(/Qtd?(?:ade)?\s*[:\s]*([\d.,]+)/i);if(mQ)it.qtd=pv(mQ[1]);}
+        if(!it.precoUnit){
+          const mPx=lj.match(/^([A-Z0-9][\w\-]*)\s+(\d+(?:[.,]\d+)?)\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s*$/);
+          if(mPx){it.lote=it.lote||mPx[1];it.qtd=pv(mPx[2]);it.precoUnit=pv(mPx[3]);}
+          const mPy=lj.match(/^(\d+(?:[.,]\d+)?)\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s*$/);
+          if(mPy){it.qtd=pv(mPy[1]);it.precoUnit=pv(mPy[2]);}
+        }
+      }
+      if((it.descricao.length>1||it.referencia.length>1)&&!/^(?:descri[çc][aã]o|c[oó]digo|lote\b|qtd\b|pre[çc]o|valor\b)/i.test(it.descricao))r.itens.push(it);
+    }
+  }
+  return r;
+}
+
+async function carregarRegistros(){
+  try{
+    const snap=await getDocs(collection(db,'procedimentos_cba'));
+    const meds=new Set(),hosps=new Set(),convs=new Set();
+    snap.forEach(d=>{
+      const data=d.data();
+      if(data.medico?.trim())meds.add(data.medico.trim());
+      if(data.hospital?.trim())hosps.add(data.hospital.trim());
+      const conv=(data.convenio||data.plano||'').trim();if(conv)convs.add(conv);
+    });
+    fichas.forEach(f=>{
+      if(f.medico?.trim())meds.add(f.medico.trim());
+      if(f.hospital?.trim())hosps.add(f.hospital.trim());
+      const conv=(f.convenio||'').trim();if(conv)convs.add(conv);
+    });
+    _medicos=[...meds].sort();
+    _hospitais=[...hosps].sort();
+    const opt=arr=>arr.sort().map(v=>`<option value="${v.replace(/"/g,'&quot;')}">`).join('');
+    const dlM=document.getElementById('dl-medico');
+    const dlH=document.getElementById('dl-hospital');
+    const dlC=document.getElementById('dl-convenio');
+    if(dlM)dlM.innerHTML=opt(_medicos);
+    if(dlH)dlH.innerHTML=opt(_hospitais);
+    if(dlC)dlC.innerHTML=opt([...convs]);
+  }catch(e){console.error('Erro ao carregar registros:',e);}
+}
+
+function preencherDeC160(d){
+  if(d.paciente)document.getElementById('f-pac').value=d.paciente;
+  if(d.medico)document.getElementById('f-med').value=d.medico;
+  if(d.hospital)document.getElementById('f-hosp').value=d.hospital;
+  if(d.convenio)document.getElementById('f-conv').value=d.convenio;
+  if(d.convenio)document.getElementById('f-cliente').value=d.convenio;
+  if(d.numeroPedido)document.getElementById('f-pedido').value=d.numeroPedido;
+  if(d.dataCirurgia)document.getElementById('f-data').value=d.dataCirurgia;
+  if(d.itens?.length){itens=d.itens.map(i=>({...i}));renderItens();}
+}
+
+window.exportarCSV=()=>{
+  const lista=filtradas();if(!lista.length){toast('Nenhuma ficha para exportar.','info');return;}
+  const fD=d=>d?new Date(d+'T00:00:00').toLocaleDateString('pt-BR'):'';
+  const fV=v=>v?Number(v).toFixed(2).replace('.',','):'';
+  const cab=['Paciente','Médico','Procedimento','Hospital','Convênio','Nº PV','Data Cirurgia','Status','Total'];
+  const rows=lista.map(f=>[f.paciente,f.medico,f.procedimento,f.hospital,f.convenio,
+    f.numeroPedido,fD(f.dataCirurgia),STATUS[f.status??0].label,fV(f.total)]
+    .map(v=>'"'+(v||'').replace(/"/g,'""')+'"').join(';'));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+[cab.join(';'),...rows].join('\n'),{type:'text/csv;charset=utf-8'}]));
+  a.download='fichas-opme-cba-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function toast(msg,tipo='ok'){
+  const t=document.createElement('div');t.className='toast t-'+tipo;t.textContent=msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.2s';setTimeout(()=>t.remove(),200);},3000);
+}
+
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))fecharModal();});
+
+// Sincronização: Convênio → Cliente (auto-preencher cliente com convênio se vazio)
+document.getElementById('f-conv').addEventListener('change',()=>{
+  const clienteInput=document.getElementById('f-cliente');
+  if(!clienteInput.value.trim())clienteInput.value=document.getElementById('f-conv').value;
+});
+
+// Sincronização: Hospital → Cliente (auto-preencher cliente com hospital se vazio)
+document.getElementById('f-hosp').addEventListener('change',()=>{
+  const clienteInput=document.getElementById('f-cliente');
+  if(!clienteInput.value.trim()){clienteInput.value=document.getElementById('f-hosp').value;}
+});
+</script>
 </body>
 </html>

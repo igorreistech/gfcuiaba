@@ -1,13 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Portfólio de desenvolvimento">
-  <defs>
-    <linearGradient id="bg" x1="96" y1="64" x2="416" y2="448" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#38bdf8"/>
-      <stop offset="1" stop-color="#34d399"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="104" fill="#0f172a"/>
-  <rect x="56" y="56" width="400" height="400" rx="82" fill="url(#bg)" opacity="0.18"/>
-  <path d="M190 170 104 256l86 86" fill="none" stroke="#e5edf7" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M322 170 408 256l-86 86" fill="none" stroke="#e5edf7" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M286 132 226 380" fill="none" stroke="#38bdf8" stroke-width="34" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#2a9fbf"/>
+  <path d="M80 256 L190 256 L220 160 L256 352 L292 180 L322 256 L432 256"
+        stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
