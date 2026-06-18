@@ -421,15 +421,6 @@ function autoTransitoNF(nfValue) {
     }
 }
 
-function autoPreencherRetiradaColeta(dataCirurgia) {
-    if (!dataCirurgia) return;
-    const d = new Date(dataCirurgia + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    const retirada = d.toISOString().slice(0, 10);
-    const campo = document.getElementById('f-data-retirar');
-    if (campo) campo.value = retirada;
-}
-
 async function save() {
     // Operações já salvas diretamente no Firebase — onSnapshot atualiza a UI
 }
@@ -517,7 +508,7 @@ function autoBackupJSON() {
             const dataHoje = new Date().toISOString().split('T')[0];
             const hora = new Date().toTimeString().slice(0,5).replace(':','-');
             a.href = url;
-            a.download = `autobackup_campogrande_${dataHoje}_${hora}.json`;
+            a.download = `autobackup_cuiaba_${dataHoje}_${hora}.json`;
             a.click();
             URL.revokeObjectURL(url);
             showBackupToast();
@@ -815,7 +806,7 @@ async function exportarWhatsApp() {
 
     var linhas = [];
     linhas.push('Olá! 😊');
-    linhas.push('Segue as pendências de *Monitor Cirúrgico* que ainda não foram devolvidos ao estoque:');
+    linhas.push('Segue as pendências do *Mapa Cirúrgico Hospitalar* que ainda não foram devolvidas ao estoque:');
     cirurgias.forEach(function(p) {
         linhas.push('');
         linhas.push('---');
@@ -3215,7 +3206,7 @@ function exportBackupJSON() {
     const a = document.createElement('a');
     const dataHoje = new Date().toISOString().split('T')[0];
     a.href = url;
-    a.download = `backup_campogrande_${dataHoje}.json`;
+    a.download = `backup_cuiaba_${dataHoje}.json`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -3295,15 +3286,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window._prodMap = _prodMap;
 });
 
-
-function autoRetirada(dataCirurgia) {
-    if (!dataCirurgia) return;
-    const d = new Date(dataCirurgia + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    const retirada = d.toISOString().slice(0, 10);
-    const campo = document.getElementById('f-retirada');
-    if (campo) campo.value = retirada;
-}
 
 function toggleOutroHospital(valor) {
     const grp = document.getElementById('g-outro-hospital');
@@ -3420,6 +3402,7 @@ function removerAnexo() {
 
 // ─── PROMOÇÃO AUTOMÁTICA: Em Procedimento → Aguardando Retirada ───
 async function verificarPromocaoRetirada() {
+    if (!window._currentUser || window._currentUser.role !== 'admin') return;
     const hoje = todayStr();
     const { setDoc, doc } = window._fbModules;
     const db = window._fbDb;
@@ -3437,7 +3420,11 @@ async function verificarPromocaoRetirada() {
         if (!proc._docId) continue;
         try {
             proc.status = 'a_retirar';
-            await setDoc(doc(db, COLL, proc._docId), proc);
+            await setDoc(doc(db, COLL, proc._docId), {
+                status: 'a_retirar',
+                autoTransicaoEm: new Date().toISOString(),
+                autoTransicaoMotivo: 'retirada_vencida'
+            }, { merge: true });
             console.log('Auto-promovido para Aguardando Retirada:', proc.paciente, proc.retirada);
         } catch(e) {
             console.warn('Erro ao promover:', proc._docId, e);
@@ -3522,7 +3509,11 @@ async function confirmarInicioCircurgia(lista, db, COLL) {
                     proc.status = 'andamento';
                     try {
                         const { setDoc: sd, doc: docFn } = window._fbModules;
-                        await sd(docFn(db, COLL, proc._docId), { ...proc });
+                        await sd(docFn(db, COLL, proc._docId), {
+                            status: 'andamento',
+                            autoTransicaoEm: new Date().toISOString(),
+                            autoTransicaoMotivo: 'confirmacao_inicio'
+                        }, { merge: true });
                         showSyncToast('⚡ ' + nomePac + ' → Em Procedimento');
                         renderCards(); updateStats();
                         if (window.currentView === 'table') renderTable();

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Fichas OPME · GF Medical · Cuiabá</title>
+<script src="pwa-register.js" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -247,7 +248,7 @@ tbody tr:hover .row-acts{opacity:1}
     </div>
     <div class="login-filial-badge">🔵 Filial Cuiabá · MT</div>
     <div class="login-title">Entrar no sistema</div>
-    <div class="login-sub">Use as mesmas credenciais do Monitor Cirúrgico</div>
+    <div class="login-sub">Use as mesmas credenciais do Mapa Cirúrgico</div>
     <div class="login-field"><label class="login-label">E-mail</label><input class="login-input" type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
     <div class="login-field"><label class="login-label">Senha</label><input class="login-input" type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="login-btn" onclick="doLogin()">Entrar</button>
@@ -278,7 +279,7 @@ tbody tr:hover .row-acts{opacity:1}
       <a class="nav-item" href="#" onclick="filtrarStatus(4);return false"><span class="nav-icon">🟠</span> Aguard. Faturamento<span class="nbadge nb4" id="nb4">0</span></a>
       <a class="nav-item" href="#" onclick="filtrarStatus(5);return false"><span class="nav-icon">🟢</span> Faturado<span class="nbadge nb5" id="nb5">0</span></a>
       <div class="sdiv"></div>
-      <a class="nav-item" href="index.html"><span class="nav-icon">⬅</span> Monitor Cirúrgico</a>
+      <a class="nav-item" href="index.html"><span class="nav-icon">⬅</span> Mapa Cirúrgico</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-chip">
@@ -418,15 +419,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-
-const firebaseConfig = {
-  apiKey:"AIzaSyCiPvYsGevYicQejvTsiC1j-64ziG2if58",
-  authDomain:"gfcuiaba-53b8d.firebaseapp.com",
-  projectId:"gfcuiaba-53b8d",
-  storageBucket:"gfcuiaba-53b8d.firebasestorage.app",
-  messagingSenderId:"105939167033",
-  appId:"1:105939167033:web:991387fc634e3d5f0d6ae8"
-};
+import { firebaseConfig } from './firebase-config.js';
 
 const COLL = 'fichas_opme';
 const FILIAL = 'CBA';
