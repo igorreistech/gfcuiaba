@@ -70,19 +70,9 @@ document.querySelectorAll("[data-copy-email]").forEach((button) => {
 });
 
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-        try {
-            const registration = await navigator.serviceWorker.getRegistration("./");
-            await registration?.unregister();
-
-            if ("caches" in window) {
-                const keys = await caches.keys();
-                await Promise.all(keys
-                    .filter((key) => key.startsWith("monitor-cba") || key.startsWith("dev-portfolio"))
-                    .map((key) => caches.delete(key)));
-            }
-        } catch (error) {
-            // O portfólio não depende do service worker para funcionar.
-        }
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {
+            // O portfólio continua funcionando mesmo sem cache offline.
+        });
     });
 }
