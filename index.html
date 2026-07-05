@@ -8361,37 +8361,6 @@ window.pedirIdentificacaoComercial = function() {
     });
 };
 
-const NOME_ESTOQUE_MARCADOR = 'Comercial e Estoque';
-const NOMES_OPERADOR_CG = ['Tiago da Silva Siqueira','Marcos Gonçalves da Silva','Marcella Fernandes Ricci','Wilson Cordeiro','Roberto Alex Cândido','Regiane da Silva Ramos','Jeferson Cruz','Leandro Sabino', NOME_ESTOQUE_MARCADOR];
-
-function _resolverNomeOperador(nome, callback) {
-    if (nome === NOME_ESTOQUE_MARCADOR) {
-        callback(nome + ' (' + new Date().toLocaleDateString('pt-BR') + ')');
-    } else {
-        callback(nome);
-    }
-}
-
-window.pedirIdentificacaoComercial = function() {
-    return new Promise(resolve => {
-        const overlay = document.getElementById('identComercialOverlay');
-        const lista = document.getElementById('identComercialNomes');
-        if (!overlay || !lista) { resolve(null); return; }
-        lista.innerHTML = NOMES_OPERADOR_CG.map(nome => {
-            const label = nome === NOME_ESTOQUE_MARCADOR ? nome : nome.split(' ')[0];
-            return `<button type="button" class="login-btn" style="margin-top:0;text-transform:none;font-size:0.95rem;" onclick="window._resolverIdentComercial('${nome}')">${label}</button>`;
-        }).join('');
-        window._resolverIdentComercial = function(nome) {
-            if (nome === null) { overlay.classList.add('hidden'); resolve(null); return; }
-            _resolverNomeOperador(nome, nomeFinal => {
-                overlay.classList.add('hidden');
-                resolve(nomeFinal);
-            });
-        };
-        overlay.classList.remove('hidden');
-    });
-};
-
 function _precisaNomeOp() {
     if (!window._currentUser) return false;
     if (window._operadorNome) return false;
