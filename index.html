@@ -209,6 +209,9 @@
 
       window.doLogout = async function() {
         if (confirm('Deseja sair do sistema?')) {
+          sessionStorage.removeItem('_nomeComercialCGR');
+          sessionStorage.removeItem('_comercialModoCompleto');
+          window._operadorNome = null;
           try { await auth.signOut(); } catch(e) {}
         }
       };
@@ -345,6 +348,7 @@
           if (user) {
             const emailLower = (user.email || '').toLowerCase();
             const isAdminFixo = ADMIN_EMAILS_FIXOS.includes(emailLower);
+            const isComercialUnico = emailLower === 'comercial@gfmedical.net';
             let perfil = null;
             if (isAdminFixo) {
               perfil = { email: emailLower, nome: user.email, role: 'admin' };
@@ -373,14 +377,40 @@
             const logoutEl  = document.getElementById('logoutBtn');
             const adminBtn  = document.getElementById('btn-gerenciar-usuarios');
             const agendView = document.getElementById('agendadorView');
+            const comercialView = document.getElementById('comercialView');
             const mainCont  = document.querySelector('.container');
             if (logoutEl) logoutEl.style.display = 'block';
 
             const fabGroup = document.querySelector('.fab-group');
-            if (perfil.role === 'agendador') {
+            if (isComercialUnico) {
+              let nomeOp = sessionStorage.getItem('_nomeComercialCGR');
+              const modoCompleto = sessionStorage.getItem('_comercialModoCompleto') === '1';
+              if (!nomeOp && !modoCompleto) {
+                nomeOp = window.pedirIdentificacaoComercial ? await window.pedirIdentificacaoComercial() : null;
+                if (nomeOp) sessionStorage.setItem('_nomeComercialCGR', nomeOp);
+                else sessionStorage.setItem('_comercialModoCompleto', '1');
+              }
+              if (nomeOp) window._operadorNome = nomeOp;
+              const isEstoque = nomeOp && nomeOp.endsWith(' (Estoque)');
+              if (nomeOp && !isEstoque) {
+                if (mainCont)  mainCont.style.display  = 'none';
+                if (adminBtn)  adminBtn.style.display  = 'none';
+                if (fabGroup)  fabGroup.style.display  = 'none';
+                if (agendView) agendView.style.display = 'none';
+                if (comercialView) comercialView.style.display = 'flex';
+              } else {
+                if (mainCont)  mainCont.style.display  = '';
+                if (adminBtn)  adminBtn.style.display  = '';
+                if (fabGroup)  fabGroup.style.display  = '';
+                if (agendView) agendView.style.display = 'none';
+                if (comercialView) comercialView.style.display = 'none';
+                solicitarPermissaoNotificacoes();
+              }
+            } else if (perfil.role === 'agendador') {
               if (mainCont)  mainCont.style.display  = 'none';
               if (adminBtn)  adminBtn.style.display  = 'none';
               if (fabGroup)  fabGroup.style.display  = 'none';
+              if (comercialView) comercialView.style.display = 'none';
               if (agendView) {
                 agendView.style.display = 'flex';
                 const nomeEl = document.getElementById('agendador-nome');
@@ -393,6 +423,7 @@
               if (adminBtn)  adminBtn.style.display  = '';
               if (fabGroup)  fabGroup.style.display  = '';
               if (agendView) agendView.style.display = 'none';
+              if (comercialView) comercialView.style.display = 'none';
               solicitarPermissaoNotificacoes();
             }
           } else {
@@ -401,10 +432,12 @@
             const logoutEl  = document.getElementById('logoutBtn');
             const adminBtn  = document.getElementById('btn-gerenciar-usuarios');
             const agendView = document.getElementById('agendadorView');
+            const comercialView = document.getElementById('comercialView');
             const mainCont  = document.querySelector('.container');
             if (logoutEl)  logoutEl.style.display  = 'none';
             if (adminBtn)  adminBtn.style.display  = 'none';
             if (agendView) agendView.style.display = 'none';
+            if (comercialView) comercialView.style.display = 'none';
             if (mainCont)  mainCont.style.display  = '';
           }
         }
@@ -4376,6 +4409,34 @@
     </div>
 </div>
 
+<div class="login-overlay hidden" id="identComercialOverlay" style="z-index:600;">
+    <div class="login-box">
+        <div class="login-logo">⬡ GF Medical</div>
+        <div class="login-sub">Quem está operando agora?</div>
+        <div id="identComercialNomes" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+        <div style="margin-top:12px;"><button class="login-toggle-link" onclick="window._resolverIdentComercial(null)">Não está na lista (modo completo)</button></div>
+    </div>
+</div>
+
+<!-- COMERCIAL VIEW (conta compartilhada comercial@gfmedical.net) -->
+<div id="comercialView">
+    <div class="agendador-header">
+        <div class="agendador-brand">
+            <div>
+                <div class="agendador-brand-logo">⬡ GF Medical</div>
+                <div class="agendador-brand-sub">Monitor Cirúrgico · Cuiabá</div>
+            </div>
+        </div>
+        <div class="agendador-user-info">
+            <span class="agendador-user-name">Comercial</span>
+            <button class="agendador-logout-btn" onclick="doLogout()">Sair ↩</button>
+        </div>
+    </div>
+    <div class="agendador-body" style="display:flex;align-items:center;justify-content:center;min-height:70vh;">
+        <button class="agendador-btn-nova" style="margin-bottom:0;font-size:1.25rem;padding:22px 44px;" onclick="openModal()">+ Adicionar Cirurgia</button>
+    </div>
+</div>
+
 <!-- ADMIN MODAL -->
 <div id="adminModal">
     <div class="admin-modal-box">
@@ -8300,7 +8361,43 @@ window.pedirIdentificacaoComercial = function() {
     });
 };
 
-function _precisaNomeOp() { return false; }
+const NOME_ESTOQUE_MARCADOR = 'Comercial e Estoque';
+const NOMES_OPERADOR_CG = ['Tiago da Silva Siqueira','Marcos Gonçalves da Silva','Marcella Fernandes Ricci','Wilson Cordeiro','Roberto Alex Cândido','Regiane da Silva Ramos','Jeferson Cruz','Leandro Sabino', NOME_ESTOQUE_MARCADOR];
+
+function _resolverNomeOperador(nome, callback) {
+    if (nome === NOME_ESTOQUE_MARCADOR) {
+        callback(nome + ' (' + new Date().toLocaleDateString('pt-BR') + ')');
+    } else {
+        callback(nome);
+    }
+}
+
+window.pedirIdentificacaoComercial = function() {
+    return new Promise(resolve => {
+        const overlay = document.getElementById('identComercialOverlay');
+        const lista = document.getElementById('identComercialNomes');
+        if (!overlay || !lista) { resolve(null); return; }
+        lista.innerHTML = NOMES_OPERADOR_CG.map(nome => {
+            const label = nome === NOME_ESTOQUE_MARCADOR ? nome : nome.split(' ')[0];
+            return `<button type="button" class="login-btn" style="margin-top:0;text-transform:none;font-size:0.95rem;" onclick="window._resolverIdentComercial('${nome}')">${label}</button>`;
+        }).join('');
+        window._resolverIdentComercial = function(nome) {
+            if (nome === null) { overlay.classList.add('hidden'); resolve(null); return; }
+            _resolverNomeOperador(nome, nomeFinal => {
+                overlay.classList.add('hidden');
+                resolve(nomeFinal);
+            });
+        };
+        overlay.classList.remove('hidden');
+    });
+};
+
+function _precisaNomeOp() {
+    if (!window._currentUser) return false;
+    if (window._operadorNome) return false;
+    const em = (window._currentUser.email || '').toLowerCase();
+    return em.startsWith('comercialmt@gfmedical') || em.startsWith('comercial@gfmedical');
+}
 
 function cancelarNomeOp() {
     document.getElementById('modalNomeOp').classList.remove('open');
