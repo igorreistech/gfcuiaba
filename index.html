@@ -9,35 +9,27 @@
     <link rel="apple-touch-icon" href="logo.jpg">
     <title>Monitor Cirúrgico · Cuiabá - MT</title>
     <meta name="description" content="Monitor Cirúrgico GF Medical — Cuiabá, MT. Acompanhamento em tempo real de procedimentos cirúrgicos.">
-    <!-- Firebase SDK -->
+    <!-- Supabase SDK (migrado do Firebase) -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, collection, onSnapshot, addDoc, setDoc, deleteDoc, doc, getDoc, getDocs, query, where, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+      import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+      import { createFirestoreShim, createStorageShim } from "./supabase-shim.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCiPvYsGevYicQejvTsiC1j-64ziG2if58",
-        authDomain: "gfcuiaba-53b8d.firebaseapp.com",
-        projectId: "gfcuiaba-53b8d",
-        storageBucket: "gfcuiaba-53b8d.firebasestorage.app",
-        messagingSenderId: "105939167033",
-        appId: "1:105939167033:web:991387fc634e3d5f0d6ae8"
-      };
+      const SUPABASE_URL = "https://cyztucqhfotqhauavepu.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_LnJYIlIDvTF6l4MMQwZ-Kg_uCBXnZRM";
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      enableIndexedDbPersistence(db).catch(()=>{});
-      const auth = getAuth(app);
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const auth = supabase.auth;
       window._fbAuth = auth;
-      const COLL = "procedimentos_cba";
+      window._supabase = supabase;
+      const COLL = "procedimentos";
 
+      const db = supabase;
       window._fbDb = db;
       window._fbColl = COLL;
-      window._fbModules = { collection, onSnapshot, addDoc, setDoc, deleteDoc, doc, getDoc, getDocs, query, where };
-      const storage = getStorage(app);
-      window._fbStorage = storage;
-      window._fbStorageModules = { ref, uploadBytes, getDownloadURL };
+      window._fbModules = createFirestoreShim(supabase);
+      const { collection, doc, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, query, orderBy } = window._fbModules;
+      window._fbStorage = supabase.storage;
+      window._fbStorageModules = createStorageShim(supabase, 'opme');
 
       // ─── NOTIFICAÇÕES PUSH ───
       window._notifStatusAnterior = null; // null = primeira carga, não notifica
@@ -201,12 +193,13 @@
         if (!email || !pass) { err.textContent = 'Preencha e-mail e senha.'; err.style.display = 'block'; return; }
         btn.disabled = true; btn.textContent = 'Entrando...'; err.style.display = 'none';
         try {
-          await signInWithEmailAndPassword(auth, email, pass);
+          const { error } = await auth.signInWithPassword({ email, password: pass });
+          if (error) throw error;
         } catch(e) {
           let msg = 'E-mail ou senha incorretos.';
-          if (e.code === 'auth/invalid-email')          msg = 'E-mail inválido.';
-          if (e.code === 'auth/too-many-requests')      msg = 'Muitas tentativas. Tente mais tarde.';
-          if (e.code === 'auth/network-request-failed') msg = 'Erro de rede. Verifique sua conexão.';
+          if (e.message?.includes('Invalid login credentials')) msg = 'E-mail ou senha incorretos.';
+          if (e.message?.includes('rate limit'))                msg = 'Muitas tentativas. Tente mais tarde.';
+          if (e.message?.includes('Failed to fetch'))            msg = 'Erro de rede. Verifique sua conexão.';
           err.textContent = msg; err.style.display = 'block';
           document.getElementById('loginPass').value = '';
           const box = document.querySelector('.login-box');
@@ -214,58 +207,9 @@
         } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
       };
 
-      window.doAdminLoadCodigo = async function() {
-        try {
-          const snap = await getDoc(doc(db, 'config', 'acesso'));
-          const el = document.getElementById('admin-codigo');
-          if (el && snap.exists()) el.value = snap.data().codigo || '';
-        } catch(e) {}
-      };
-      window.doAdminSaveCodigo = async function() {
-        const el = document.getElementById('admin-codigo');
-        const codigo = (el?.value || '').trim();
-        try {
-          await setDoc(doc(db, 'config', 'acesso'), { codigo });
-          if (el) { el.style.borderColor = '#87c396'; setTimeout(()=>{ el.style.borderColor=''; }, 1500); }
-        } catch(e) { alert('Erro ao salvar: '+e.message); }
-      };
-
-      window.showLogin = function() {
-        document.getElementById('loginPanel').style.display = 'block';
-        document.getElementById('resetPanel').style.display = 'none';
-        document.getElementById('loginError').style.display = 'none';
-      };
-      window.showResetPassword = function() {
-        document.getElementById('loginPanel').style.display = 'none';
-        document.getElementById('resetPanel').style.display = 'block';
-        document.getElementById('loginError').style.display = 'none';
-        document.getElementById('resetSuccessMsg').style.display = 'none';
-        const emailField = document.getElementById('loginUser');
-        if (emailField && emailField.value) document.getElementById('resetEmail').value = emailField.value;
-      };
-      window.doResetPassword = async function() {
-        const email = (document.getElementById('resetEmail').value || '').trim();
-        const err = document.getElementById('loginError');
-        const btn = document.getElementById('resetBtn');
-        if (!email) { err.textContent = 'Informe seu e-mail.'; err.style.display = 'block'; return; }
-        btn.disabled = true; btn.textContent = 'Enviando…';
-        try {
-          await sendPasswordResetEmail(auth, email);
-          err.style.display = 'none';
-          document.getElementById('resetSuccessMsg').style.display = 'block';
-        } catch(e) {
-          let msg = 'Erro ao enviar e-mail.';
-          if (e.code === 'auth/user-not-found') msg = 'E-mail não encontrado.';
-          else if (e.code === 'auth/invalid-email') msg = 'E-mail inválido.';
-          err.textContent = msg; err.style.display = 'block';
-        } finally {
-          btn.disabled = false; btn.textContent = 'Enviar link';
-        }
-      };
-
       window.doLogout = async function() {
         if (confirm('Deseja sair do sistema?')) {
-          try { await signOut(auth); } catch(e) {}
+          try { await auth.signOut(); } catch(e) {}
         }
       };
 
@@ -356,11 +300,22 @@
         const nome    = (nomeEl?.value||'').trim();
         if (!email) { emailEl?.focus(); return; }
         try {
-          await setDoc(doc(db, 'usuarios', email.replace(/[^a-z0-9]/g,'_')), { email, role, nome: nome||email });
+          const { data: sessionData } = await auth.getSession();
+          const resp = await fetch(SUPABASE_URL + '/functions/v1/create-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + sessionData.session.access_token,
+            },
+            body: JSON.stringify({ email, role, nome: nome || email }),
+          });
+          const result = await resp.json();
+          if (!resp.ok) throw new Error(result.error || 'Falha ao criar usuário.');
           if (emailEl) emailEl.value = '';
           if (nomeEl)  nomeEl.value  = '';
+          alert(`Usuário criado. Senha temporária: ${result.temp_password}\n\nCompartilhe com a pessoa por um canal seguro.`);
           doAdminLoadUsers();
-        } catch(e) { alert('Erro ao salvar: '+e.message); }
+        } catch(e) { alert('Erro ao criar usuário: '+e.message); }
       };
       window.doAdminDeleteUser = async function(docId) {
         if (!confirm('Remover este usuário?')) return;
@@ -372,14 +327,15 @@
       };
       window.openAdminModal = function() {
         const m = document.getElementById('adminModal');
-        if (m) { m.style.display = 'flex'; doAdminLoadUsers(); doAdminLoadCodigo(); }
+        if (m) { m.style.display = 'flex'; doAdminLoadUsers(); }
       };
       window.closeAdminModal = function() {
         const m = document.getElementById('adminModal');
         if (m) m.style.display = 'none';
       };
 
-      onAuthStateChanged(auth, (user) => {
+      auth.onAuthStateChange((_event, session) => {
+        const user = session?.user ?? null;
         async function aplicarAuth() {
           const overlay = document.getElementById('loginOverlay');
           if (!overlay) { setTimeout(aplicarAuth, 50); return; }
@@ -391,31 +347,28 @@
             const isAdminFixo = ADMIN_EMAILS_FIXOS.includes(emailLower);
             let perfil = null;
             if (isAdminFixo) {
-              perfil = { email: emailLower, nome: user.displayName || user.email, role: 'admin', uid: user.uid };
-              try { await setDoc(doc(db, 'usuarios', user.uid), { ...perfil }); } catch(e) {}
+              perfil = { email: emailLower, nome: user.email, role: 'admin' };
+              try { await setDoc(doc(db, 'usuarios', user.id), { ...perfil }); } catch(e) {}
             } else {
               try {
-                const snap = await getDoc(doc(db, 'usuarios', user.uid));
+                const snap = await getDoc(doc(db, 'usuarios', user.id));
                 if (snap.exists()) {
                   perfil = snap.data();
                 } else {
-                  // Novo usuário via OAuth: auto-cadastra como agendador
-                  perfil = { email: emailLower, nome: user.displayName || user.email, role: 'agendador', uid: user.uid };
-                  await setDoc(doc(db, 'usuarios', user.uid), perfil);
+                  perfil = { email: emailLower, nome: user.email, role: 'agendador' };
+                  await setDoc(doc(db, 'usuarios', user.id), perfil);
                 }
               } catch(e) { perfil = null; }
             }
 
-            // Garante que sempre há um perfil válido (somente para não-admins)
             if (!perfil) {
-              perfil = { email: emailLower, nome: user.displayName || user.email, role: 'agendador', uid: user.uid };
-              try { await setDoc(doc(db, 'usuarios', user.uid), perfil, { merge: true }); } catch(e2) {}
+              perfil = { email: emailLower, nome: user.email, role: 'agendador' };
+              try { await setDoc(doc(db, 'usuarios', user.id), perfil); } catch(e2) {}
             }
 
-            // Segurança final: emails fixos SEMPRE são admin, nunca agendador
             if (isAdminFixo) perfil.role = 'admin';
 
-            window._currentUser = { uid: user.uid, email: user.email, nome: perfil.nome || user.displayName || user.email, role: perfil.role };
+            window._currentUser = { uid: user.id, email: user.email, nome: perfil.nome || user.email, role: perfil.role };
             overlay.classList.add('hidden');
             const logoutEl  = document.getElementById('logoutBtn');
             const adminBtn  = document.getElementById('btn-gerenciar-usuarios');
@@ -434,7 +387,6 @@
                 if (nomeEl) nomeEl.textContent = (window._currentUser.nome||'').split(' ')[0] || user.email;
               }
               solicitarPermissaoNotificacoes();
-              // Re-renderiza com retry para garantir que dados do Firestore já chegaram
               window._renderAgendadorRetry && window._renderAgendadorRetry();
             } else {
               if (mainCont)  mainCont.style.display  = '';
@@ -458,17 +410,6 @@
         }
         aplicarAuth();
       });
-
-      // Garante que config/acesso existe com código padrão na primeira execução
-      (async () => {
-        try {
-          const acessoRef = doc(db, 'config', 'acesso');
-          const acessoSnap = await getDoc(acessoRef);
-          if (!acessoSnap.exists()) {
-            await setDoc(acessoRef, { codigo: '140424' });
-          }
-        } catch(e) {}
-      })();
 
       window.addEventListener('DOMContentLoaded', () => {
         const { collection: col, onSnapshot: snap } = window._fbModules;

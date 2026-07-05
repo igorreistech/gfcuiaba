@@ -416,26 +416,21 @@ tbody tr:hover .row-acts{opacity:1}
 </div>
 
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createFirestoreShim, createStorageShim } from './supabase-shim.js';
 
-const firebaseConfig = {
-  apiKey:"AIzaSyCiPvYsGevYicQejvTsiC1j-64ziG2if58",
-  authDomain:"gfcuiaba-53b8d.firebaseapp.com",
-  projectId:"gfcuiaba-53b8d",
-  storageBucket:"gfcuiaba-53b8d.firebasestorage.app",
-  messagingSenderId:"105939167033",
-  appId:"1:105939167033:web:991387fc634e3d5f0d6ae8"
-};
+const SUPABASE_URL = 'https://cyztucqhfotqhauavepu.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_LnJYIlIDvTF6l4MMQwZ-Kg_uCBXnZRM';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const auth = supabase.auth;
+const db = supabase;
+const { collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, getDocs } = createFirestoreShim(supabase);
+const { ref, uploadBytes, getDownloadURL } = createStorageShim(supabase, 'opme');
 
 const COLL = 'fichas_opme';
 const FILIAL = 'CBA';
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-const storage = getStorage(app);
+let _currentAuthUser = null;
 
 if (typeof pdfjsLib !== 'undefined')
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -454,13 +449,15 @@ let _medicos=[], _hospitais=[];
 let _arquivoOpme=null, _arquivoPv=null;
 let _anexoUrlAtual={opme:null, pv:null};
 
-onAuthStateChanged(auth, u => {
+auth.onAuthStateChange((_event, session) => {
+  _currentAuthUser = session?.user ?? null;
+  const u = _currentAuthUser;
   if (u) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-root').style.display = 'flex';
-    const nome = u.displayName || u.email || '';
-    document.getElementById('user-nm').textContent = nome.split(' ')[0] || nome;
-    document.getElementById('user-av').textContent = nome.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase() || '?';
+    const nome = u.email || '';
+    document.getElementById('user-nm').textContent = nome.split('@')[0] || nome;
+    document.getElementById('user-av').textContent = (nome.split('@')[0] || '?').slice(0,2).toUpperCase();
     carregarFichas();
     carregarRegistros();
   } else {
@@ -474,25 +471,22 @@ window.doLogin = async () => {
   const senha = document.getElementById('l-senha').value;
   const er = document.getElementById('l-err');
   er.classList.remove('show');
-  try { await signInWithEmailAndPassword(auth, email, senha); }
-  catch { er.classList.add('show'); }
+  try {
+    const { error } = await auth.signInWithPassword({ email, password: senha });
+    if (error) throw error;
+  } catch { er.classList.add('show'); }
 };
 
-window.doLogout = () => signOut(auth);
+window.doLogout = () => auth.signOut();
 
 let _unsubFichas = null;
 function carregarFichas() {
   if (_unsubFichas) { _unsubFichas(); _unsubFichas = null; }
   try {
-    const q = query(collection(db, COLL), orderBy('criadoEm','desc'));
-    _unsubFichas = onSnapshot(q, snap => {
+    _unsubFichas = onSnapshot(collection(db, COLL), snap => {
       fichas = snap.docs.map(d => ({_id:d.id, ...d.data()}));
+      fichas.sort((a,b) => (b.criadoEm||'') > (a.criadoEm||'') ? 1 : -1);
       atualizarBadges(); renderAtivo();
-    }, () => {
-      _unsubFichas = onSnapshot(collection(db, COLL), snap => {
-        fichas = snap.docs.map(d => ({_id:d.id, ...d.data()}));
-        atualizarBadges(); renderAtivo();
-      });
     });
   } catch(e) { console.error(e); }
 }
@@ -500,18 +494,17 @@ function carregarFichas() {
 async function uploadAnexo(file, tipo, fichaId) {
   const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
   const path = `opme/${fichaId}/${tipo}_${Date.now()}.${ext}`;
-  const storageRef = ref(storage, path);
+  const storageRef = ref(supabase.storage, path);
   await uploadBytes(storageRef, file);
   return await getDownloadURL(storageRef);
 }
 
 async function persistir(dados, id) {
-  if (!auth.currentUser) throw new Error('Faça login para salvar.');
-  const p = {...dados, filial: FILIAL, atualizadoEm: serverTimestamp()};
+  if (!_currentAuthUser) throw new Error('Faça login para salvar.');
+  const p = {...dados, filial: FILIAL};
   let docId = id;
   if (!docId) {
-    p.criadoEm = serverTimestamp();
-    p.criadoPor = auth.currentUser.email || '';
+    p.criadoPor = _currentAuthUser.id;
     const docRef = await addDoc(collection(db, COLL), p);
     docId = docRef.id;
   } else {
@@ -527,7 +520,7 @@ async function persistir(dados, id) {
     anexos.pvAnexoNome = _arquivoPv.name;
   }
   if (Object.keys(anexos).length) {
-    await setDoc(doc(db, COLL, docId), {...anexos, atualizadoEm: serverTimestamp()}, {merge: true});
+    await setDoc(doc(db, COLL, docId), anexos, {merge: true});
   }
   _arquivoOpme = null;
   _arquivoPv = null;
@@ -541,7 +534,7 @@ window.excluirFicha = async id => {
 };
 
 window.mudStatus = async (id, s) => {
-  await setDoc(doc(db, COLL, id), {status:s, atualizadoEm:serverTimestamp()}, {merge:true});
+  await setDoc(doc(db, COLL, id), {status:s}, {merge:true});
 };
 
 window.goView = v => {
@@ -1195,7 +1188,7 @@ function parsearC160(texto,filename){
 
 async function carregarRegistros(){
   try{
-    const snap=await getDocs(collection(db,'procedimentos_cba'));
+    const snap=await getDocs(collection(db,'procedimentos'));
     const meds=new Set(),hosps=new Set(),convs=new Set();
     snap.forEach(d=>{
       const data=d.data();
