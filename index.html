@@ -416,7 +416,6 @@
                 const nomeEl = document.getElementById('agendador-nome');
                 if (nomeEl) nomeEl.textContent = (window._currentUser.nome||'').split(' ')[0] || user.email;
               }
-              solicitarPermissaoNotificacoes();
               window._renderAgendadorRetry && window._renderAgendadorRetry();
             } else {
               if (mainCont)  mainCont.style.display  = '';
@@ -500,10 +499,11 @@
                   p.status = 'preparacao';
                   autoTransitar(p, 'agendado');
                 }
-                // Em Separação ou Em Trânsito + dia da cirurgia → pede confirmação
-                else if ((p.status === 'preparacao' || p.status === 'em_transito') && p.data && p.data === hoje
-                         && !window._confirmacaoInicioFeita.has(p._docId)) {
-                  paraPromover.push(p);
+                // Em Separação ou Em Trânsito + dia da cirurgia → Em Procedimento (automático, sem confirmação)
+                else if ((p.status === 'preparacao' || p.status === 'em_transito') && p.data && p.data === hoje) {
+                  const statusAnterior = p.status;
+                  p.status = 'andamento';
+                  autoTransitar(p, statusAnterior);
                 }
 
                 // Data de retirada = hoje → Aguardando Retirada (automático)
@@ -4418,6 +4418,7 @@
     </div>
 </div>
 
+
 <!-- COMERCIAL VIEW (conta compartilhada comercial@gfmedical.net) -->
 <div id="comercialView">
     <div class="agendador-header">
@@ -8318,29 +8319,22 @@ function editProc(docId) {
     }
 }
 
-// ─── IDENTIFICAÇÃO OPERADOR (contas comerciais compartilhadas) ───
-// Nomes completos batem com o cadastro de vendedores (select #f-vendedor) —
-// Gabriely Amorim Dias e Gustavo Ovídio Mussi Faverão ficam de fora da
-// identificação por não serem agendadores que usam a conta comercial@.
 // "Comercial e Estoque" é uma opção genérica (equipe sem nome fixo na lista):
 // ao escolher, pede o nome da pessoa por texto livre.
 const NOME_ESTOQUE_MARCADOR = 'Comercial e Estoque';
 const NOMES_OPERADOR_CG = ['Tiago da Silva Siqueira','Marcos Gonçalves da Silva','Marcella Fernandes Ricci','Wilson Cordeiro','Roberto Alex Cândido','Regiane da Silva Ramos','Jeferson Cruz','Leandro Sabino', NOME_ESTOQUE_MARCADOR];
+let _pendingOpenModal = null;
 
 function _resolverNomeOperador(nome, callback) {
     if (nome === NOME_ESTOQUE_MARCADOR) {
         const real = (prompt('Equipe Comercial e Estoque — qual o seu nome?') || '').trim();
-        if (!real) return; // cancelou, mantém o seletor aberto
+        if (!real) return;
         callback(real + ' (Estoque)');
         return;
     }
     callback(nome);
 }
-let _pendingOpenModal = null;
 
-// Identificação logo após o login da conta comercial@gfmedical.net: se a
-// pessoa se reconhece num dos nomes, cai na tela única "+ Adicionar
-// Cirurgia"; se não (botão "Não está na lista"), cai no Monitor completo.
 window.pedirIdentificacaoComercial = function() {
     return new Promise(resolve => {
         const overlay = document.getElementById('identComercialOverlay');
@@ -18732,7 +18726,21 @@ window.buildCardHTML = function(proc) {
 
 <div style="position:fixed;bottom:0;left:0;right:0;background:rgba(6,10,9,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.06);padding:8px 24px;display:flex;align-items:center;justify-content:center;gap:12px;font-family:monospace;font-size:0.72rem;color:#8a9e97;z-index:50;letter-spacing:0.05em;">&copy; 2025 <span style="color:#4db87a;font-weight:700;">GF Medical</span> &middot; Desenvolvido por <a href="https://devigorreis.github.io/portfolio/" target="_blank" style="color:#eef2f0;text-decoration:underline;font-weight:700;">Igor Reis</a> &middot; Todos os direitos reservados</div>
 <script>
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // Verifica periodicamente se há versão nova (o navegador só checa sozinho em navegações)
+      setInterval(() => reg.update(), 60000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update(); });
+    });
+    // Quando uma versão nova assume o controle (cache bump), recarrega sozinho
+    // em vez de depender do usuário limpar cache manualmente.
+    let _swRefreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (_swRefreshing) return;
+      _swRefreshing = true;
+      window.location.reload();
+    });
+  }
 </script>
 <!-- ── PDF NF Import ── -->
 <script>
