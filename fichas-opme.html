@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script>if(new URLSearchParams(location.search).get('demo')==='1')document.documentElement.classList.add('modo-demo');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Fichas OPME · GF Medical · Cuiabá</title>
@@ -29,6 +30,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .app{display:flex;min-height:100vh;position:relative;z-index:1}
 .sidebar{width:224px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;box-shadow:var(--shadow)}
 .sidebar-logo{padding:15px 16px;border-bottom:1px solid var(--border)}
+html.modo-demo .sidebar-logo,html.modo-demo .login-logo,html.modo-demo .login-filial-badge,html.modo-demo #sidebar-filial-label,html.modo-demo .ftag{display:none!important}
+body.ficha-readonly #btnNovaFicha,body.ficha-readonly .abtn,body.ficha-readonly .kbtn{display:none!important}
 .logo-mark{display:flex;align-items:center;gap:10px}
 .logo-icon{width:34px;height:34px;border-radius:8px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:8px}
@@ -199,7 +202,7 @@ tbody tr:hover .row-acts{opacity:1}
 .import-badge.show{display:inline-flex}
 .itens-section{margin-bottom:14px}
 .itens-hdr{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.item-row{display:grid;grid-template-columns:3fr 1.2fr 1fr 0.8fr 0.9fr 28px;gap:6px;align-items:center;margin-bottom:5px}
+.item-row{display:grid;grid-template-columns:1.2fr 3fr 1fr 0.8fr 0.9fr 28px;gap:6px;align-items:center;margin-bottom:5px}
 .item-row .finput{padding:6px 9px;font-size:0.76rem}
 .item-row input[type=number]{font-family:var(--mono);font-size:0.82rem;text-align:center}
 .item-rm{background:none;border:1px solid var(--border);color:var(--text3);border-radius:6px;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.12s}
@@ -297,7 +300,7 @@ tbody tr:hover .row-acts{opacity:1}
       <span class="page-title" id="page-title">Lista de Fichas</span>
       <div class="sbox"><span style="color:var(--text3)">🔍</span><input type="text" id="busca" placeholder="Paciente, médico…" oninput="renderAtivo()"></div>
       <button class="tbtn tbtn-g" onclick="exportarCSV()">⬇️ Exportar</button>
-      <button class="tbtn tbtn-p" onclick="abrirModal()">＋ Nova Ficha</button>
+      <button class="tbtn tbtn-p" id="btnNovaFicha" onclick="abrirModal()">＋ Nova Ficha</button>
     </div>
     <div class="vtabs">
       <div class="vtab" id="tab-dashboard" onclick="goView('dashboard')">📊 Dashboard</div>
@@ -387,11 +390,11 @@ tbody tr:hover .row-acts{opacity:1}
       <div class="itens-section">
         <div class="itens-hdr">
           <span>🔩 Itens OPME</span>
-          <span style="font-weight:400;opacity:0.7;font-size:0.58rem">Descrição · Referência · Lote · Qtd · Preço Unit</span>
+          <span style="font-weight:400;opacity:0.7;font-size:0.58rem">Referência · Descrição · Lote · Qtd · Preço Unit</span>
         </div>
-        <div style="display:grid;grid-template-columns:3fr 1.2fr 1fr 0.8fr 0.9fr 28px;gap:6px;margin-bottom:3px;padding:0 2px">
-          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Descrição</span>
+        <div style="display:grid;grid-template-columns:1.2fr 3fr 1fr 0.8fr 0.9fr 28px;gap:6px;margin-bottom:3px;padding:0 2px">
           <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Referência</span>
+          <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Descrição</span>
           <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Lote</span>
           <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Qtd</span>
           <span style="font-family:var(--mono);font-size:0.53rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3)">Preço Unit</span>
@@ -425,7 +428,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_LnJYIlIDvTF6l4MMQwZ-Kg_uCBXnZRM';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const auth = supabase.auth;
 const db = supabase;
-const { collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, getDocs } = createFirestoreShim(supabase);
+const { collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, getDocs, getDoc } = createFirestoreShim(supabase);
 const { ref, uploadBytes, getDownloadURL } = createStorageShim(supabase, 'opme');
 
 const COLL = 'fichas_opme';
@@ -449,9 +452,15 @@ let _medicos=[], _hospitais=[];
 let _arquivoOpme=null, _arquivoPv=null;
 let _anexoUrlAtual={opme:null, pv:null};
 
+const DEMO_EMAIL = 'demo@test.com';
+
 auth.onAuthStateChange((_event, session) => {
   _currentAuthUser = session?.user ?? null;
   const u = _currentAuthUser;
+  const isDemo = !!u && (u.email||'').toLowerCase() === DEMO_EMAIL;
+  window._isDemoUser = isDemo;
+  document.documentElement.classList.toggle('modo-demo', isDemo);
+  if (isDemo) document.title = document.title.replace(/\s*·\s*GF Medical/i, '').replace(/\s*·\s*Cuiabá/i, '');
   if (u) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-root').style.display = 'flex';
@@ -460,6 +469,15 @@ auth.onAuthStateChange((_event, session) => {
     document.getElementById('user-av').textContent = (nome.split('@')[0] || '?').slice(0,2).toUpperCase();
     carregarFichas();
     carregarRegistros();
+    // Escritas de papel "visualizacao" já são bloqueadas no banco (RLS) —
+    // isso aqui é só pra não deixar a pessoa clicar em algo que vai falhar
+    // com um erro confuso.
+    window._fichaReadOnly = false;
+    getDoc(doc(db, 'usuarios', u.id)).then(snap => {
+      const role = snap.exists() ? snap.data().role : null;
+      window._fichaReadOnly = role === 'visualizacao';
+      document.body.classList.toggle('ficha-readonly', window._fichaReadOnly);
+    }).catch(() => {});
   } else {
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app-root').style.display = 'none';
@@ -480,11 +498,45 @@ window.doLogin = async () => {
 window.doLogout = () => auth.signOut();
 
 let _unsubFichas = null;
+// Mascaramento do demo: mesmo localStorage/chaves do Monitor Cirúrgico
+// (index.html), então o mesmo hospital/médico real vira o mesmo rótulo
+// demo nas duas páginas.
+function mascararFichasDemo(lista) {
+  if (!window._isDemoUser) return lista;
+  let maskMaps;
+  try { maskMaps = JSON.parse(localStorage.getItem('_demoMaskMaps') || '{}'); } catch(e) { maskMaps = {}; }
+  const maskField = (campo, chave, rotulo) => {
+    if (!chave) return chave;
+    if (!maskMaps[campo]) maskMaps[campo] = {};
+    if (!maskMaps[campo][chave]) maskMaps[campo][chave] = rotulo + ' ' + (Object.keys(maskMaps[campo]).length + 1);
+    return maskMaps[campo][chave];
+  };
+  const maskData = (dataStr, docId) => {
+    if (!dataStr) return dataStr;
+    let hash = 0;
+    for (let i = 0; i < (docId||'').length; i++) hash = (hash * 31 + docId.charCodeAt(i)) | 0;
+    const d = new Date(dataStr + 'T00:00:00');
+    if (isNaN(d)) return dataStr;
+    d.setDate(d.getDate() + (Math.abs(hash) % 41) - 20);
+    return d.toISOString().split('T')[0];
+  };
+  lista.forEach(f => {
+    if (f.paciente)      f.paciente      = maskField('paciente', f._id, 'Paciente Demo');
+    if (f.medico)        f.medico        = maskField('medico', f.medico, 'Dr(a). Demo');
+    if (f.hospital)      f.hospital      = maskField('hospital', f.hospital, 'Hospital Demo');
+    if (f.convenio)      f.convenio      = maskField('convenio', f.convenio, 'Convênio Demo');
+    if (f.cliente)       f.cliente       = maskField('convenio', f.cliente, 'Convênio Demo');
+    if (f.dataCirurgia)  f.dataCirurgia  = maskData(f.dataCirurgia, f._id);
+  });
+  try { localStorage.setItem('_demoMaskMaps', JSON.stringify(maskMaps)); } catch(e) {}
+  return lista;
+}
+
 function carregarFichas() {
   if (_unsubFichas) { _unsubFichas(); _unsubFichas = null; }
   try {
     _unsubFichas = onSnapshot(collection(db, COLL), snap => {
-      fichas = snap.docs.map(d => ({_id:d.id, ...d.data()}));
+      fichas = mascararFichasDemo(snap.docs.map(d => ({_id:d.id, ...d.data()})));
       fichas.sort((a,b) => (b.criadoEm||'') > (a.criadoEm||'') ? 1 : -1);
       atualizarBadges(); renderAtivo();
     });
@@ -811,6 +863,10 @@ function renderDashboard() {
 }
 
 window.abrirModal = id => {
+  if (window._fichaReadOnly && !id) {
+    if (typeof toast === 'function') toast('Modo somente visualização — não é possível criar novas fichas.', 'info');
+    return;
+  }
   editingId=id||null; itens=[];
   _arquivoOpme=null; _arquivoPv=null;
   _anexoUrlAtual={opme:null, pv:null};
@@ -864,7 +920,20 @@ window.abrirModal = id => {
   }
   renderItens();
   document.getElementById('modal').classList.add('open');
+  aplicarModoLeituraModal();
 };
+
+function aplicarModoLeituraModal() {
+  const modal = document.getElementById('modal');
+  if (!modal) return;
+  const so = !!window._fichaReadOnly;
+  modal.querySelectorAll('input, select, textarea').forEach(el => { el.disabled = so; });
+  modal.querySelectorAll('.item-rm, .add-item').forEach(el => { el.style.display = so ? 'none' : ''; });
+  const btnSalvar = document.getElementById('btn-salvar');
+  if (btnSalvar) btnSalvar.style.display = so ? 'none' : '';
+  const title = document.getElementById('modal-title');
+  if (title && so && editingId) title.textContent = '👁 Ficha OPME (somente visualização)';
+}
 
 window.fecharModal = () => { document.getElementById('modal').classList.remove('open'); editingId=null; };
 
@@ -906,8 +975,8 @@ window.salvarFicha = async () => {
 function renderItens() {
   document.getElementById('itens-container').innerHTML=itens.map((it,i)=>`
     <div class="item-row">
-      <input class="finput" placeholder="Descrição…" value="${esc(it.descricao||'')}" oninput="itens[${i}].descricao=this.value;calcTotal()">
       <input class="finput" placeholder="Ref/Cód" value="${esc(it.referencia||'')}" oninput="itens[${i}].referencia=this.value">
+      <input class="finput" placeholder="Descrição…" value="${esc(it.descricao||'')}" oninput="itens[${i}].descricao=this.value;calcTotal()">
       <input class="finput" placeholder="Lote" value="${esc(it.lote||'')}" oninput="itens[${i}].lote=this.value">
       <input class="finput" type="number" min="0" step="1" value="${it.qtd||1}" oninput="itens[${i}].qtd=+this.value;calcTotal()">
       <input class="finput" type="number" min="0" step="0.01" value="${it.precoUnit||0}" oninput="itens[${i}].precoUnit=+this.value;calcTotal()">
@@ -923,7 +992,7 @@ function coletarItens(){
   document.querySelectorAll('#itens-container .item-row').forEach((row,i)=>{
     if(!itens[i])return;
     const inp=row.querySelectorAll('input');
-    itens[i].descricao=inp[0].value;itens[i].referencia=inp[1].value;itens[i].lote=inp[2].value;
+    itens[i].referencia=inp[0].value;itens[i].descricao=inp[1].value;itens[i].lote=inp[2].value;
     itens[i].qtd=Number(inp[3].value)||1;itens[i].precoUnit=Number(inp[4].value)||0;
   });
 }
@@ -1105,12 +1174,21 @@ function parsearC160(texto,filename){
     // dígito no código para não casar palavras comuns (RUA, CENTRO…). Também
     // evita casar linhas de endereço/telefone com número de 6+ dígitos
     // seguido de hífen (CEP, CNPJ).
-    const re=/^([A-Z0-9]{2,12})\s+(.+?)\s+(\d{6,})\s*-\s*(.+)$/gm;
+    const re=/^([A-Z0-9+]{2,12})\s+(.+?)\s+(\d{6,})\s*-\s*(.+)$/gm;
     let m;
     while((m=re.exec(txt))){
       if(!/\d/.test(m[1]))continue;
       if(/CEP|CNPJ|Fax\b|Tel\.|Insc\.|Bairro|Endere[çc]|Brasil|LOJA\b/i.test(m[0]))continue;
-      const desc=lmp(m[2]);if(desc.length>=3)bases.push({referencia:m[1],descricao:desc});
+      const desc=lmp(m[2]);if(desc.length<3)continue;
+      const item={referencia:m[1],descricao:desc};
+      // Em muitos C160 reais, o Nº de sequência do item vem colado direto no
+      // fim do nome do fabricante (sem espaço) — daí em diante vêm, nessa
+      // ordem: Qtd., Preço Unit., Desconto, Desc. Arred., Vl. Frete,
+      // Subtotal, Valor Total, A faturar, Data. Captura Qtd. e Preço Unit.
+      // direto da mesma linha do item.
+      const mNum=m[4].match(/\d{1,4}\s+(\d+,\d{2})\s+([\d.]+,\d{2})\s+[\d.]+,\d{2}\s+[\d.]+,\d{2}\s+[\d.]+,\d{2}\s+[\d.]+,\d{2}\s+[\d.]+,\d{2}\s+\d+\s+\d{2}\/\d{2}\/\d{4}/);
+      if(mNum){item.qtd=pv(mNum[1]);item.precoUnit=pv(mNum[2]);}
+      bases.push(item);
     }
   }
   // C) Preço unitário + quantidade — em muitos C160 reais essas colunas vêm
@@ -1129,10 +1207,13 @@ function parsearC160(texto,filename){
     const idxUn=ls.findIndex(l=>/^Unidade\s*:?\s*(?:PC)?\s*$/i.test(l));
     if(idxUn>=0){for(let k=idxUn+1;k<ls.length;k++){if(/^[\d.,]+$/.test(ls[k]))qtys.push(pv(ls[k]));else break;}}
   }
-  // Fallback antigo: "SEQ PREÇOUNIT VALORTOTAL DATA" em linha própria
+  // Fallback antigo: "SEQ PREÇOUNIT VALORTOTAL DATA" em linha própria — o
+  // pdf.js costuma preservar um espaço à esquerda do número de sequência,
+  // então o início da linha precisa tolerar esse espaço em vez de exigir o
+  // dígito colado no `^`.
   const prices=[];
   if(lineVals.length<bases.length){
-    const re=/^(\d{1,3})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+\d{2}\/\d{2}\/\d{4}\s*$/gm;
+    const re=/^\s*(\d{1,3})\s+([\d.]+,\d{2})\s+([\d.]+,\d{2})\s+\d{2}\/\d{2}\/\d{4}\s*$/gm;
     let m;
     while((m=re.exec(txt)))prices.push({precoUnit:pv(m[2])});
   }
@@ -1147,7 +1228,7 @@ function parsearC160(texto,filename){
   }
   bases.forEach((b,i)=>{
     const lv=lineVals[i];
-    r.itens.push({descricao:b.descricao,referencia:b.referencia,lote:lotes[i]||'',qtd:lv?lv.qtd:(qtys[i]!=null?qtys[i]:1),precoUnit:lv?lv.precoUnit:(prices[i]?.precoUnit||0)});
+    r.itens.push({descricao:b.descricao,referencia:b.referencia,lote:lotes[i]||'',qtd:b.qtd!=null?b.qtd:(lv?lv.qtd:(qtys[i]!=null?qtys[i]:1)),precoUnit:b.precoUnit!=null?b.precoUnit:(lv?lv.precoUnit:(prices[i]?.precoUnit||0))});
   });
   // 10. Fallback — formato antigo "SEQ COD DESC QTY PREÇO TOTAL" em linha única
   if(!r.itens.length){
