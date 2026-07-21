@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v13-demo-fix';
+const CACHE = 'monitor-cba-v14-swfix';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
@@ -38,11 +38,11 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  const isLocal = !url.hostname.includes('googleapis') &&
-                  !url.hostname.includes('gstatic') &&
-                  !url.hostname.includes('firebaseapp') &&
-                  !url.hostname.includes('cdnjs');
-  if (isLocal && url.pathname.startsWith(BASE)) {
+  // Só tenta cache em requisições realmente do mesmo domínio do site (GET) —
+  // antes isso incluía por engano chamadas ao Supabase (login, leituras,
+  // escritas), e tentar cachear um POST derruba com erro do Cache API.
+  const isLocal = url.origin === self.location.origin;
+  if (isLocal && e.request.method === 'GET' && url.pathname.startsWith(BASE)) {
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
         const clone = res.clone();
