@@ -382,6 +382,13 @@ tbody tr:hover .row-acts{opacity:1}
         <div class="fg"><label class="flbl">Convênio</label><input class="finput" id="f-conv" placeholder="Ex: Unimed, SUS…" list="dl-convenio"><datalist id="dl-convenio"></datalist></div>
       </div>
       <div class="frow">
+        <div class="fg"><label class="flbl">Operador *</label>
+          <select class="finput" id="f-operador-ficha">
+            <option value="">Selecione quem está lançando</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
         <div class="fg"><label class="flbl">Nº Pedido de Venda</label><input class="finput" id="f-pedido" placeholder="Ex: 4795"></div>
         <div class="fg"></div>
       </div>
@@ -441,6 +448,12 @@ const { collection, addDoc, setDoc, doc, deleteDoc, onSnapshot, query, orderBy, 
 const { ref, uploadBytes, getDownloadURL } = createStorageShim(supabase, 'opme');
 
 const COLL = 'fichas_opme';
+
+// Mesma lista do index.html — quem lança a ficha precisa se identificar,
+// senão a Atividade cai no fallback e mostra o e-mail da conta em vez do
+// nome de quem realmente fez o lançamento.
+const NOMES_OPERADOR_CBA = ['Beatriz Helena Calil Barbosa','Cristina Luzia','Izabela Crozetta','Kauana da Silva Feitoza','Murilo Julio Sant Ana Pereira','Renata Franco de Lima','Starley Santos Silva','Wilson Cordeiro','Roberto Alex Cândido','Marcio Benedito Queiroz'];
+function _nomesOperadorAtivos() { return NOMES_OPERADOR_CBA; }
 const FILIAL = 'CBA';
 let _currentAuthUser = null;
 
@@ -1024,6 +1037,11 @@ window.abrirModal = id => {
   });
   document.getElementById('import-badge').classList.remove('show');
   document.getElementById('pv-input').value='';
+  const selOperadorFicha = document.getElementById('f-operador-ficha');
+  if (selOperadorFicha) {
+    selOperadorFicha.innerHTML = '<option value="">Selecione quem está lançando</option>' +
+      _nomesOperadorAtivos().map(nome => `<option value="${nome}">${nome}</option>`).join('');
+  }
   if (id) {
     const f=fichas.find(x=>x._id===id); if(!f) return;
     document.getElementById('modal-title').textContent='✏️ Editar Ficha OPME';
@@ -1034,6 +1052,7 @@ window.abrirModal = id => {
     document.getElementById('f-cliente').value = f.cliente||'';
     document.getElementById('f-conv').value   = f.convenio||'';
     document.getElementById('f-pedido').value = f.numeroPedido||'';
+    if (selOperadorFicha) selOperadorFicha.value = f.operadorNome || '';
     document.getElementById('f-data').value   = f.dataCirurgia||'';
     document.getElementById('f-status').value = f.status??0;
     document.getElementById('f-obs').value    = f.observacoes||'';
@@ -1061,6 +1080,7 @@ window.abrirModal = id => {
     document.getElementById('f-hosp').value   = up.get('hospital')    ||'';
     document.getElementById('f-conv').value   = up.get('convenio')    ||'';
     document.getElementById('f-pedido').value = '';
+    if (selOperadorFicha) selOperadorFicha.value = '';
     document.getElementById('f-data').value   = up.get('data')        ||'';
     document.getElementById('f-obs').value    = '';
     document.getElementById('f-status').value=0;
@@ -1091,6 +1111,13 @@ window.salvarFicha = async () => {
   const proc=document.getElementById('f-proc').value.trim();
   if(!pac){alert('Informe o paciente.');return;}
   if(!med){alert('Informe o médico.');return;}
+  const operadorFicha = document.getElementById('f-operador-ficha')?.value || '';
+  if (!operadorFicha) {
+    const oEl = document.getElementById('f-operador-ficha');
+    if (oEl) { oEl.style.borderColor = '#f97316'; oEl.focus(); }
+    alert('⚠️ Selecione o nome de quem está lançando esta ficha.');
+    return;
+  }
   coletarItens();
   const iv=itens.filter(i=>i.descricao.trim());
   const total=iv.reduce((s,i)=>s+(Number(i.precoUnit)||0)*(Number(i.qtd)||0),0);
@@ -1102,7 +1129,8 @@ window.salvarFicha = async () => {
     dataCirurgia:document.getElementById('f-data').value,
     status:parseInt(document.getElementById('f-status').value),
     observacoes:document.getElementById('f-obs').value.trim(),
-    itens:iv,total};
+    itens:iv,total,
+    operadorNome:operadorFicha};
   const btn=document.getElementById('btn-salvar');
   btn.disabled=true; btn.textContent='Salvando…';
   try {
