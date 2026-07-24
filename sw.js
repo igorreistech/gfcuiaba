@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v14-swfix';
+const CACHE = 'monitor-cba-v15-icons';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
@@ -6,7 +6,10 @@ const LOCAL_ASSETS = [
   BASE + 'styles.css',
   BASE + 'app.js',
   BASE + 'manifest.json',
-  BASE + 'icon.svg',
+  BASE + 'icon-192.png',
+  BASE + 'icon-512.png',
+  BASE + 'icon-192-maskable.png',
+  BASE + 'icon-512-maskable.png',
 ];
 
 self.addEventListener('install', e => {
