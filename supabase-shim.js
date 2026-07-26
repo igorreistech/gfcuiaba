@@ -27,6 +27,7 @@ const FIELD_MAPS = {
     coletaTransportadora: 'coleta_transportadora',
     coletaObs: 'coleta_obs',
     coletaAnexo: 'coleta_anexo',
+    coletaChaveAcesso: 'coleta_chave_acesso',
     _filial: 'filial',
     isColeta: 'is_coleta',
     cadastradoPor: 'cadastrado_por',
