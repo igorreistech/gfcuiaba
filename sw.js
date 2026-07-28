@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v18-nfimport';
+const CACHE = 'monitor-cba-v19-nfimport';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
