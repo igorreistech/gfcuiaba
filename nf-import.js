@@ -511,4 +511,7 @@
         }
         input.value = '';
     };
+
+    // Reaproveitado por fretes.html (importação do PDF do CT-e no Controle de Fretes).
+    window.NFImport = { carregarPdfJs: carregarPdfJs, parsearTextoNF: parsearTextoNF };
 })();
