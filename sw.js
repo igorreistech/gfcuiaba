@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v25';
+const CACHE = 'monitor-cba-v26';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
@@ -46,8 +46,8 @@ self.addEventListener('fetch', e => {
   // antes isso incluía por engano chamadas ao Supabase (login, leituras,
   // escritas), e tentar cachear um POST derruba com erro do Cache API.
   const isLocal = url.origin === self.location.origin;
-  // fretes.html (aviso de nova versão) e os arquivos .sql sempre da rede: o cache guardava versões antigas.
-  if (isLocal && /fretes\.html$|\.sql$/.test(url.pathname)) { e.respondWith(fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request))); return; }
+  // fretes.html (aviso de nova versão), fretes-config.js e os arquivos .sql sempre da rede: o cache guardava versões antigas.
+  if (isLocal && /fretes\.html$|fretes-config\.js$|\.sql$/.test(url.pathname)) { e.respondWith(fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request))); return; }
   if (isLocal && e.request.method === 'GET' && url.pathname.startsWith(BASE)) {
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
