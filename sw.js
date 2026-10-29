@@ -1,4 +1,4 @@
-const CACHE = 'monitor-cba-v87';
+const CACHE = 'monitor-cba-v88';
 const BASE = new URL('./', self.location).pathname;
 const LOCAL_ASSETS = [
   BASE,
